@@ -427,9 +427,22 @@
   .pdf-preview th { background: #eef2ff; }
   @media print {
     body * { visibility: hidden !important; }
+    /* Journal PDF */
     #preview-panel, #preview-panel * { visibility: visible !important; }
     #preview-panel { display: block !important; position: static !important; max-height: none !important; background: white !important; border: none !important; margin: 0 !important; padding: 0 !important; }
     .pdf-preview { border: none !important; border-radius: 0 !important; max-height: none !important; overflow: visible !important; padding: 0 !important; }
+    /* Impression Planning Semaine */
+    body.print-planning * { visibility: hidden !important; }
+    body.print-planning #print-planning-zone,
+    body.print-planning #print-planning-zone * { visibility: visible !important; }
+    body.print-planning #print-planning-zone {
+      position: fixed !important; top: 0; left: 0; width: 100%;
+      background: white !important; padding: 20px !important;
+    }
+    .plan-cell[contenteditable]:focus { outline: none !important; }
+    .plan-edit-hint { display: none !important; }
+    .plan-cell.empty { display: none !important; }
+    .plan-badge { background: #eee !important; color: #333 !important; }
   }
 
   /* ── ONGLETS ─────────────────────────────────────────────────── */
@@ -1070,14 +1083,22 @@
           padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)">
         🔄 Actualiser météo
       </button>
-      <button onclick="window.print()"
+      <button onclick="printPlanning()"
         style="background:rgba(22,163,74,.2);color:var(--green);border:1px solid rgba(22,163,74,.3);
           border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)">
         🖨 Imprimer
       </button>
+      <button onclick="resetPlanningCells()"
+        style="background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3);
+          border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)">
+        ↺ Réinitialiser
+      </button>
     </div>
   </div>
 
+  <div class="plan-edit-hint" style="font-size:10px;color:#8b949e;text-align:right;padding:0 4px 6px;font-style:italic">
+    ✏️ Cliquez dans une cellule pour modifier · Sauvegarde automatique
+  </div>
   <div class="plan-alert">
     ⚡ <strong>BY-PASS ACTIF</strong> depuis le 11/05/26 jusqu'au 21/10/26 &nbsp;|&nbsp;
     Tâche 45 démarre le <strong>01/06/26</strong> (Ouverture top CE + escalier colimaçon) &nbsp;|&nbsp;
@@ -1106,23 +1127,38 @@
         <!-- SECTION COORDINATION -->
         <div class="plan-cell sec-label">🤝 COORDINATION & RÉUNIONS</div>
 
-        <div class="plan-cell task coord-cell">
+        <div class="plan-cell task coord-cell" contenteditable="true" data-cell-id="pc1"
+      oninput="savePlanCell('pc1',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-coord">COORD</span>
           Réunion lancement<br>pré-mobilisation<br><strong>08h00</strong><br>Tous chefs d'équipe
         </div>
-        <div class="plan-cell task coord-cell">
+        <div class="plan-cell task coord-cell" contenteditable="true" data-cell-id="pc2"
+      oninput="savePlanCell('pc2',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-coord">COORD</span>
           Rédaction PV<br>visite de site<br>+ journal chantier
         </div>
-        <div class="plan-cell task coord-cell">
+        <div class="plan-cell task coord-cell" contenteditable="true" data-cell-id="pc3"
+      oninput="savePlanCell('pc3',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-coord">COORD</span>
           Réunion coordination<br>contrôle avancement<br>préparatifs
         </div>
-        <div class="plan-cell task coord-cell">
+        <div class="plan-cell task coord-cell" contenteditable="true" data-cell-id="pc4"
+      oninput="savePlanCell('pc4',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-coord">COORD</span>
           MAJ journal<br>chantier<br>+ courriers SWDE
         </div>
-        <div class="plan-cell task coord-cell">
+        <div class="plan-cell task coord-cell" contenteditable="true" data-cell-id="pc5"
+      oninput="savePlanCell('pc5',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-coord">COORD</span>
           Rapport hebdo :<br>tâches réalisées<br>+ points ouverts
         </div>
@@ -1131,23 +1167,38 @@
         <!-- SECTION PRÉPA T45 -->
         <div class="plan-cell sec-label">🔧 PRÉPARATION TÂCHE 45 — 01/06 : Ouverture top CE + Démontage escalier colimaçon (15j)</div>
 
-        <div class="plan-cell task prep-cell">
+        <div class="plan-cell task prep-cell" contenteditable="true" data-cell-id="pc6"
+      oninput="savePlanCell('pc6',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-prep">PRÉPA</span>
           Visite site CE :<br>Relevé accès top CE<br>État escalier<br>colimaçon existant
         </div>
-        <div class="plan-cell task prep-cell">
+        <div class="plan-cell task prep-cell" contenteditable="true" data-cell-id="pc7"
+      oninput="savePlanCell('pc7',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-prep">PRÉPA</span>
           Revue plans :<br>ouverture top CE<br>+ méthode démontage<br>escalier colimaçon
         </div>
-        <div class="plan-cell task prep-cell">
+        <div class="plan-cell task prep-cell" contenteditable="true" data-cell-id="pc8"
+      oninput="savePlanCell('pc8',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-prep">PRÉPA</span>
           Finalisation note<br>de méthode :<br>procédure découpe<br>+ plan de levage
         </div>
-        <div class="plan-cell task prep-cell">
+        <div class="plan-cell task prep-cell" contenteditable="true" data-cell-id="pc9"
+      oninput="savePlanCell('pc9',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-prep">PRÉPA</span>
           Commande/confirm.<br>matériel découpe<br>et équip. levage
         </div>
-        <div class="plan-cell task alert-cell">
+        <div class="plan-cell task alert-cell" contenteditable="true" data-cell-id="pc10"
+      oninput="savePlanCell('pc10',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-alert">⚡ JALON</span>
           <strong>Validation plans T45</strong><br>avec Bureau d'études<br>→ GO pour 01/06 !
         </div>
@@ -1156,23 +1207,38 @@
         <!-- SECTION PRÉPA T21 -->
         <div class="plan-cell sec-label">🏗 PRÉPARATION TÂCHE 21 — 08/06 : Montage échafaudage + lift (25j)</div>
 
-        <div class="plan-cell task prep-cell">
+        <div class="plan-cell task prep-cell" contenteditable="true" data-cell-id="pc11"
+      oninput="savePlanCell('pc11',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-prep">PRÉPA</span>
           Vérification accès<br>chantier : voie<br>circulation + zone<br>dépôt
         </div>
-        <div class="plan-cell task prep-cell">
+        <div class="plan-cell task prep-cell" contenteditable="true" data-cell-id="pc12"
+      oninput="savePlanCell('pc12',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-prep">PRÉPA</span>
           Confirmation<br>commande échafaudage<br>+ plans de pose<br>+ délai livraison
         </div>
-        <div class="plan-cell task prep-cell">
+        <div class="plan-cell task prep-cell" contenteditable="true" data-cell-id="pc13"
+      oninput="savePlanCell('pc13',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-prep">PRÉPA</span>
           Réception plan<br>d'installation<br>échafaudage + lift
         </div>
-        <div class="plan-cell task prep-cell">
+        <div class="plan-cell task prep-cell" contenteditable="true" data-cell-id="pc14"
+      oninput="savePlanCell('pc14',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-prep">PRÉPA</span>
           Vérification besoins<br>permis de voirie<br>/ accès
         </div>
-        <div class="plan-cell task alert-cell">
+        <div class="plan-cell task alert-cell" contenteditable="true" data-cell-id="pc15"
+      oninput="savePlanCell('pc15',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-alert">⚡ JALON</span>
           <strong>Validation plan<br>échafaudage + lift</strong><br>par conducteur
         </div>
@@ -1181,23 +1247,38 @@
         <!-- SECTION SÉCURITÉ -->
         <div class="plan-cell sec-label">🦺 SÉCURITÉ — PSS / PERMIS / ANALYSE RISQUES</div>
 
-        <div class="plan-cell task secu-cell">
+        <div class="plan-cell task secu-cell" contenteditable="true" data-cell-id="pc16"
+      oninput="savePlanCell('pc16',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-secu">SÉCU</span>
           Revue PSS :<br>mise à jour<br>travaux juin<br>+ risques top CE
         </div>
-        <div class="plan-cell task secu-cell">
+        <div class="plan-cell task secu-cell" contenteditable="true" data-cell-id="pc17"
+      oninput="savePlanCell('pc17',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-secu">SÉCU</span>
           Analyse risque<br>tâche 45 :<br>travaux en hauteur<br>+ levage
         </div>
-        <div class="plan-cell task secu-cell">
+        <div class="plan-cell task secu-cell" contenteditable="true" data-cell-id="pc18"
+      oninput="savePlanCell('pc18',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-secu">SÉCU</span>
           Rédaction/MAJ<br>fiche sécurité<br>+ EPI requis<br>tâche 45
         </div>
-        <div class="plan-cell task secu-cell">
+        <div class="plan-cell task secu-cell" contenteditable="true" data-cell-id="pc19"
+      oninput="savePlanCell('pc19',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-secu">SÉCU</span>
           Vérification<br>permis de travail<br>+ accès SWDE<br>+ permis feu
         </div>
-        <div class="plan-cell task secu-cell">
+        <div class="plan-cell task secu-cell" contenteditable="true" data-cell-id="pc20"
+      oninput="savePlanCell('pc20',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-secu">SÉCU</span>
           Validation PSS<br>mis à jour<br>+ transmission<br>aux équipes
         </div>
@@ -1206,17 +1287,26 @@
         <!-- SECTION BY-PASS -->
         <div class="plan-cell sec-label">💧 BY-PASS & EXPLOITATION SWDE — Fenêtre active : 11/05/26 → 21/10/26</div>
 
-        <div class="plan-cell task bypass-cell">
+        <div class="plan-cell task bypass-cell" contenteditable="true" data-cell-id="pc21"
+      oninput="savePlanCell('pc21',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-bypass">BY-PASS</span>
           Confirm. statut<br>by-pass actif<br>+ vérif. pression<br>réseau
         </div>
         <div class="plan-cell empty">—</div>
-        <div class="plan-cell task bypass-cell">
+        <div class="plan-cell task bypass-cell" contenteditable="true" data-cell-id="pc22"
+      oninput="savePlanCell('pc22',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-bypass">BY-PASS</span>
           Coordination SWDE :<br>planning vidange<br>(prévue 03/08/26)<br>+ contact exploit.
         </div>
         <div class="plan-cell empty">—</div>
-        <div class="plan-cell task bypass-cell">
+        <div class="plan-cell task bypass-cell" contenteditable="true" data-cell-id="pc23"
+      oninput="savePlanCell('pc23',this)"
+      onfocus="this.dataset.orig=this.innerHTML"
+      style="cursor:text;min-height:60px;white-space:pre-wrap">
           <span class="plan-badge badge-bypass">BY-PASS</span>
           Rapport statut<br>by-pass transmis<br>+ PV hebdo SWDE
         </div>
@@ -2324,6 +2414,106 @@ function showToast(msg, type='green') {
 // ═══════════════════════════════════════════════════════════════════
 //  ONGLETS
 // ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+//  PLANNING SEMAINE — Cellules éditables + persistance localStorage
+// ═══════════════════════════════════════════════════════════════════
+const PLAN_STORAGE_KEY = 'planningCells_v1';
+
+function savePlanCell(cellId, el) {
+  const data = JSON.parse(localStorage.getItem(PLAN_STORAGE_KEY) || '{}');
+  data[cellId] = el.innerHTML;
+  localStorage.setItem(PLAN_STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadPlanCells() {
+  const data = JSON.parse(localStorage.getItem(PLAN_STORAGE_KEY) || '{}');
+  Object.entries(data).forEach(([id, html]) => {
+    const el = document.querySelector(`[data-cell-id="${id}"]`);
+    if (el && html) el.innerHTML = html;
+  });
+}
+
+function resetPlanningCells() {
+  if (!confirm('Réinitialiser le planning au contenu original ?\nToutes vos modifications seront perdues.')) return;
+  localStorage.removeItem(PLAN_STORAGE_KEY);
+  location.reload();
+}
+
+function printPlanning() {
+  // Construire une zone d'impression propre
+  let zone = document.getElementById('print-planning-zone');
+  if (!zone) {
+    zone = document.createElement('div');
+    zone.id = 'print-planning-zone';
+    zone.style.cssText = 'display:none;background:white;color:#1a1a1a;font-family:Arial,sans-serif;font-size:11px';
+    document.body.appendChild(zone);
+  }
+
+  // Récupérer le contenu du planning
+  const planTab = document.getElementById('tab-planning');
+  const header  = planTab.querySelector('.plan-header');
+  const alert   = planTab.querySelector('.plan-alert');
+  const grid    = planTab.querySelector('.plan-week-grid');
+  const jalons  = planTab.querySelector('.jalons-table');
+  const meteo   = document.getElementById('plan-w-desc')?.textContent || '';
+
+  // Récupérer le logo embarqué
+  const logoSrc = typeof WANTY_LOGO_B64 !== 'undefined' ? WANTY_LOGO_B64 : '';
+
+  // Styles inline pour impression
+  const printCSS = `
+    body { margin: 0; padding: 0; }
+    #print-planning-zone { padding: 16px; background: white; }
+    .ph { display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #1a3a5c; padding-bottom:10px; margin-bottom:12px; }
+    .ph h2 { margin:0; font-size:16px; color:#1a3a5c; }
+    .ph .meta { font-size:10px; color:#666; margin-top:3px; }
+    .alert-bar { background:#1a3a5c; color:white; padding:6px 12px; font-size:10px; border-radius:4px; margin-bottom:10px; }
+    .meteo-bar { background:#f0f4f8; padding:5px 10px; font-size:10px; color:#444; border-radius:4px; margin-bottom:12px; }
+    .plan-week-grid { display:grid; grid-template-columns:130px repeat(6,1fr); gap:2px; font-size:9.5px; }
+    .head-col,.head-day { background:#1a3a5c!important; color:white!important; text-align:center; padding:5px 3px; font-weight:700; }
+    .sec-label { background:#2e4a7a; color:white; font-size:9px; padding:4px 6px; font-weight:600; grid-column:1/-1; }
+    .task { padding:4px 5px; border:1px solid #ddd; min-height:50px; vertical-align:top; font-size:9px; line-height:1.3; }
+    .coord-cell { background:#e8f0fe!important; }
+    .prep-cell  { background:#e8f5e9!important; }
+    .secu-cell  { background:#fff8e1!important; }
+    .bypass-cell{ background:#f3e5f5!important; }
+    .alert-cell { background:#fce4ec!important; }
+    .empty { background:#f9f9f9!important; color:#bbb!important; text-align:center; }
+    .plan-badge { font-size:8px; font-weight:700; padding:1px 4px; border-radius:3px; display:inline-block; margin-bottom:2px; }
+    table { width:100%; border-collapse:collapse; font-size:9px; margin-top:10px; }
+    th { background:#1a3a5c; color:white; padding:4px 6px; text-align:left; }
+    td { border:1px solid #ddd; padding:4px 6px; }
+    .critical td { background:#fce4ec; }
+  `;
+
+  zone.innerHTML = `
+    <style>${printCSS}</style>
+    <div class="ph">
+      <div>
+        ${logoSrc ? `<img src="${logoSrc}" style="height:36px;width:auto;object-fit:contain;margin-bottom:6px;display:block">` : '<strong>GROUPE WANTY</strong>'}
+        <h2>${header?.querySelector('h2')?.textContent || 'Planning Semaine'}</h2>
+        <div class="meta">${header?.querySelector('.meta')?.textContent || ''}</div>
+      </div>
+      <div style="text-align:right;font-size:10px;color:#666">
+        <div style="color:#e67e22;font-weight:700">SEMAINE DE PRÉ-MOBILISATION</div>
+        <div>Délai : 220 JO · 02/03/26 → 01/03/27</div>
+        <div>Imprimé le ${new Date().toLocaleDateString('fr-BE')}</div>
+      </div>
+    </div>
+    ${alert ? `<div class="alert-bar">${alert.textContent.trim()}</div>` : ''}
+    <div class="meteo-bar">🌡 Météo : ${meteo}</div>
+    ${grid ? `<div class="plan-week-grid">${grid.innerHTML}</div>` : ''}
+    ${jalons ? `<table>${jalons.innerHTML}</table>` : ''}
+  `;
+
+  document.body.classList.add('print-planning');
+  window.print();
+  setTimeout(() => {
+    document.body.classList.remove('print-planning');
+    zone.innerHTML = '';
+  }, 1000);
+}
+
 function switchTab(name, btn) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -2389,6 +2579,7 @@ function refreshPlanningMeteo() {
 
 renderPersonnel();
 renderSuiviTable();
+loadPlanCells();
 renderHistory();
 initSignaturePad();
 attachDraftListeners();
