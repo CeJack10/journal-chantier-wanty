@@ -598,8 +598,25 @@
   <div class="status-chip"><span class="dot dot-green"></span>Système actif</div>
   <div class="status-chip" id="weather-status"><span class="dot dot-amber"></span>Météo : chargement…</div>
   <div class="status-chip" id="intemperie-chip" style="display:none"><span class="dot dot-red"></span>⚠ INTEMPÉRIE</div>
-  <div class="status-chip"><span class="dot dot-blue"></span>Jean-Jacques</div>
-  <div class="draft-chip" id="draft-status"><span>📝</span><span id="draft-status-text">Brouillon local</span></div>
+  <div class="status-chip" id="chip-journal" onclick="goToHistory()"
+    title="Journal actif — cliquer pour l'historique" style="cursor:pointer;gap:4px">
+    <span style="font-size:10px">📋</span>
+    <span id="chip-journal-num" style="font-family:var(--mono);font-size:11px">—</span>
+  </div>
+  <div class="status-chip" id="chip-user" style="padding:3px 8px;gap:5px">
+    <span class="dot dot-blue"></span>
+    <select id="user-select" onchange="onUserChange()"
+      title="Changer d'utilisateur"
+      style="background:transparent;border:none;color:var(--text);font-family:var(--mono);
+             font-size:12px;cursor:pointer;outline:none;padding:2px 0;max-width:155px">
+      <option value="JJ">Jean-Jacques</option>
+      <option value="SL">Stéphane Lassaux</option>
+      <option value="S1">Chef équipe S1</option>
+      <option value="EV">Chef équipe V</option>
+      <option value="LG">Logistique</option>
+    </select>
+  </div>
+  <div class="draft-chip" id="draft-status" style="display:flex"><span>📝</span><span id="draft-status-text">Aucun brouillon</span></div>
 </div>
 
 
@@ -651,7 +668,7 @@
         </div>
         <div class="field">
           <label>Gestionnaire <span class="auto">AUTO</span></label>
-          <input type="text" id="f-gestionnaire" readonly value="Jean-Jacques">
+          <input type="text" id="f-gestionnaire" value="Jean-Jacques" onchange="syncGestionnaireToChip(this.value)">
         </div>
         <div class="field">
           <label>Chantier <span class="req">*</span></label>
@@ -1338,52 +1355,52 @@
         </thead>
         <tbody>
           <tr>
-            <td><strong>Lundi 26</strong></td>
-            <td style="font-family:var(--mono)">08h00</td>
-            <td><span class="type-badge" style="background:rgba(46,117,182,.25);color:#93c5fd">RÉUNION</span></td>
-            <td>Réunion lancement pré-mobilisation — Conducteur + Chefs d'équipe + Coord. Sécu</td>
-            <td style="font-size:11px;color:var(--muted)">Bureau chantier</td>
-            <td><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc1" oninput="savePlanCell('jc1',this)"><strong>Lundi 26</strong></td>
+            <td style="cursor:text;font-family:var(--mono)" contenteditable="true" data-cell-id="jc2" oninput="savePlanCell('jc2',this)">08h00</td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc3" oninput="savePlanCell('jc3',this)"><span class="type-badge" style="background:rgba(46,117,182,.25);color:#93c5fd">RÉUNION</span></td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc4" oninput="savePlanCell('jc4',this)">Réunion lancement pré-mobilisation — Conducteur + Chefs d'équipe + Coord. Sécu</td>
+            <td style="cursor:text;font-size:11px;color:var(--muted)" contenteditable="true" data-cell-id="jc5" oninput="savePlanCell('jc5',this)">Bureau chantier</td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc6" oninput="savePlanCell('jc6',this)"><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
           </tr>
           <tr>
-            <td><strong>Mardi 27</strong></td>
-            <td style="font-family:var(--mono)">08h30</td>
-            <td><span class="type-badge" style="background:rgba(124,58,237,.25);color:#c4b5fd">VISITE</span></td>
-            <td>Visite complète CE Rhisnes — Relevé accès top CE, état escalier colimaçon, zone échafaudage</td>
-            <td style="font-size:11px;color:var(--muted)">CE Rhisnes – Suarlée</td>
-            <td><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc7" oninput="savePlanCell('jc7',this)"><strong>Mardi 27</strong></td>
+            <td style="cursor:text;font-family:var(--mono)" contenteditable="true" data-cell-id="jc8" oninput="savePlanCell('jc8',this)">08h30</td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc9" oninput="savePlanCell('jc9',this)"><span class="type-badge" style="background:rgba(124,58,237,.25);color:#c4b5fd">VISITE</span></td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc10" oninput="savePlanCell('jc10',this)">Visite complète CE Rhisnes — Relevé accès top CE, état escalier colimaçon, zone échafaudage</td>
+            <td style="cursor:text;font-size:11px;color:var(--muted)" contenteditable="true" data-cell-id="jc11" oninput="savePlanCell('jc11',this)">CE Rhisnes – Suarlée</td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc12" oninput="savePlanCell('jc12',this)"><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
           </tr>
           <tr>
-            <td><strong>Mercredi 28</strong></td>
-            <td style="font-family:var(--mono)">14h00</td>
-            <td><span class="type-badge" style="background:rgba(245,158,11,.25);color:#fcd34d">SÉCU</span></td>
-            <td>Coordination sécurité — Mise à jour PSS pour tâches 45 et 21 (travaux en hauteur, levage)</td>
-            <td style="font-size:11px;color:var(--muted)">Bureau chantier</td>
-            <td><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc13" oninput="savePlanCell('jc13',this)"><strong>Mercredi 28</strong></td>
+            <td style="cursor:text;font-family:var(--mono)" contenteditable="true" data-cell-id="jc14" oninput="savePlanCell('jc14',this)">14h00</td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc15" oninput="savePlanCell('jc15',this)"><span class="type-badge" style="background:rgba(245,158,11,.25);color:#fcd34d">SÉCU</span></td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc16" oninput="savePlanCell('jc16',this)">Coordination sécurité — Mise à jour PSS pour tâches 45 et 21 (travaux en hauteur, levage)</td>
+            <td style="cursor:text;font-size:11px;color:var(--muted)" contenteditable="true" data-cell-id="jc17" oninput="savePlanCell('jc17',this)">Bureau chantier</td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc18" oninput="savePlanCell('jc18',this)"><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
           </tr>
           <tr>
-            <td><strong>Jeudi 29</strong></td>
-            <td style="font-family:var(--mono)">09h00</td>
-            <td><span class="type-badge" style="background:rgba(46,117,182,.25);color:#93c5fd">SWDE</span></td>
-            <td>Contact SWDE Exploitation — Suivi by-pass actif + confirmation planning vidange 03/08/26</td>
-            <td style="font-size:11px;color:var(--muted)">Téléphone / Teams</td>
-            <td><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc19" oninput="savePlanCell('jc19',this)"><strong>Jeudi 29</strong></td>
+            <td style="cursor:text;font-family:var(--mono)" contenteditable="true" data-cell-id="jc20" oninput="savePlanCell('jc20',this)">09h00</td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc21" oninput="savePlanCell('jc21',this)"><span class="type-badge" style="background:rgba(46,117,182,.25);color:#93c5fd">SWDE</span></td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc22" oninput="savePlanCell('jc22',this)">Contact SWDE Exploitation — Suivi by-pass actif + confirmation planning vidange 03/08/26</td>
+            <td style="cursor:text;font-size:11px;color:var(--muted)" contenteditable="true" data-cell-id="jc23" oninput="savePlanCell('jc23',this)">Téléphone / Teams</td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc24" oninput="savePlanCell('jc24',this)"><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
           </tr>
           <tr class="critical">
-            <td><strong>Vendredi 30</strong></td>
-            <td style="font-family:var(--mono)">14h00</td>
-            <td><span class="type-badge" style="background:rgba(220,38,38,.3);color:#fca5a5">⚡ JALON</span></td>
-            <td><strong>Validation plans T45 (ouverture top CE) + plan échafaudage T21 → GO pour 01/06</strong></td>
-            <td style="font-size:11px">Bureau chantier / BE</td>
-            <td><span class="type-badge" style="background:rgba(220,38,38,.25);color:#fca5a5">CRITIQUE</span></td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc25" oninput="savePlanCell('jc25',this)"><strong>Vendredi 30</strong></td>
+            <td style="cursor:text;font-family:var(--mono)" contenteditable="true" data-cell-id="jc26" oninput="savePlanCell('jc26',this)">14h00</td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc27" oninput="savePlanCell('jc27',this)"><span class="type-badge" style="background:rgba(220,38,38,.3);color:#fca5a5">⚡ JALON</span></td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc28" oninput="savePlanCell('jc28',this)"><strong>Validation plans T45 (ouverture top CE) + plan échafaudage T21 → GO pour 01/06</strong></td>
+            <td style="cursor:text;font-size:11px" contenteditable="true" data-cell-id="jc29" oninput="savePlanCell('jc29',this)">Bureau chantier / BE</td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc30" oninput="savePlanCell('jc30',this)"><span class="type-badge" style="background:rgba(220,38,38,.25);color:#fca5a5">CRITIQUE</span></td>
           </tr>
           <tr>
-            <td><strong>Vendredi 30</strong></td>
-            <td style="font-family:var(--mono)">16h00</td>
-            <td><span class="type-badge" style="background:rgba(46,117,182,.25);color:#93c5fd">RAPPORT</span></td>
-            <td>Rapport hebdomadaire — Synthèse préparatifs, points ouverts, planning semaine 01/06</td>
-            <td style="font-size:11px;color:var(--muted)">Bureau chantier</td>
-            <td><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc31" oninput="savePlanCell('jc31',this)"><strong>Vendredi 30</strong></td>
+            <td style="cursor:text;font-family:var(--mono)" contenteditable="true" data-cell-id="jc32" oninput="savePlanCell('jc32',this)">16h00</td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc33" oninput="savePlanCell('jc33',this)"><span class="type-badge" style="background:rgba(46,117,182,.25);color:#93c5fd">RAPPORT</span></td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc34" oninput="savePlanCell('jc34',this)">Rapport hebdomadaire — Synthèse préparatifs, points ouverts, planning semaine 01/06</td>
+            <td style="cursor:text;font-size:11px;color:var(--muted)" contenteditable="true" data-cell-id="jc35" oninput="savePlanCell('jc35',this)">Bureau chantier</td>
+            <td style="cursor:text;" contenteditable="true" data-cell-id="jc36" oninput="savePlanCell('jc36',this)"><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
           </tr>
         </tbody>
       </table>
@@ -1543,9 +1560,10 @@ updateClock();
 
 // Journal counter
 function getJournalNum(chantier) {
-  const key = `journal_count_${chantier}`;
-  const n = parseInt(localStorage.getItem(key)||'0') + 1;
-  return String(n).padStart(3,'0');
+  // Conservé pour compatibilité — délègue à buildJournalNum
+  const code = getUserCode();
+  const key = 'journal_count_' + chantier + '_' + code;
+  return String(parseInt(localStorage.getItem(key) || '0') + 1).padStart(3, '0');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1665,7 +1683,8 @@ function onChantierChange() {
   if (!ch) { document.getElementById('f-client').value=''; return; }
   const info = CHANTIERS[ch];
   document.getElementById('f-client').value = info.client;
-  document.getElementById('f-num-journal').value = `${ch}-J${getJournalNum(ch)}`;
+  document.getElementById('f-num-journal').value = buildJournalNum(ch, getUserCode());
+  updateJournalChip();
   fetchMeteo(info.lat, info.lon, info.nom);
   // Charger personnel mémorisé
   loadPersonnelFromMemory(ch);
@@ -1767,7 +1786,8 @@ function handlePhotos(e) {
   Array.from(e.target.files).forEach(file => {
     const reader = new FileReader();
     reader.onload = ev => {
-      photos.push({src:ev.target.result, name:file.name});
+      const ts = new Date().toLocaleTimeString('fr-BE',{hour:'2-digit',minute:'2-digit'});
+      photos.push({src:ev.target.result, name:file.name, time:ts, label:''});
       renderPhotos();
     };
     reader.readAsDataURL(file);
@@ -1778,7 +1798,12 @@ function renderPhotos() {
   grid.innerHTML = '';
   photos.forEach((p,i) => {
     const d = document.createElement('div'); d.className='photo-thumb';
-    d.innerHTML=`<img src="${p.src}"><button class="del" onclick="photos.splice(${i},1);renderPhotos()">✕</button>`;
+    d.innerHTML=`<img src="${p.src}"><input type="text" placeholder="Légende photo ${i+1}…" value="${(p.label||'')}"
+  oninput="photos[${i}].label=this.value"
+  style="width:100%;margin-top:4px;font-size:11px;padding:3px 6px;border-radius:4px;
+         border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--mono)">
+<div style="font-size:10px;color:var(--muted);margin-top:2px">${p.time||''}</div>
+<button class="del" onclick="photos.splice(${i},1);renderPhotos()">✕</button>`;
     grid.appendChild(d);
   });
   document.getElementById('photo-count').textContent = photos.length + ' photo' + (photos.length>1?'s':'');
@@ -1873,13 +1898,18 @@ function clearSignature() {
 const DRAFT_KEY = 'journalDraft_v3';
 let draftTimer = null;
 let suspendDraftSave = false;
+let formDirty = false;
+window.addEventListener('beforeunload', function(e) {
+  if (formDirty) {
+    e.preventDefault();
+    e.returnValue = 'Des modifications non sauvegardées seront perdues.';
+    return e.returnValue;
+  }
+});
 
 function setDraftStatus(message = '', visible = false) {
-  const chip = document.getElementById('draft-status');
   const textEl = document.getElementById('draft-status-text');
-  if (!chip || !textEl) return;
-  textEl.textContent = message || 'Brouillon local';
-  chip.style.display = visible ? 'flex' : 'none';
+  if (textEl) textEl.textContent = message || 'Aucun brouillon';
 }
 
 function clearValidationState() {
@@ -1937,6 +1967,7 @@ function saveDraft(silent = true) {
 }
 
 function scheduleDraftSave() {
+  formDirty = true;
   clearTimeout(draftTimer);
   draftTimer = setTimeout(() => saveDraft(true), 500);
 }
@@ -2141,7 +2172,7 @@ function buildPdfHtml(d) {
         <div class="pdf-card"><div class="pdf-label">Nombre de photos</div><div class="pdf-value">${escapeHtml(String(d.nbPhotos || 0))}</div></div>
         <div class="pdf-card"><div class="pdf-label">Légende photos</div><div class="pdf-value">${nl2br(d.photoNote)}</div></div>
       </div>
-      ${(d.photos || []).length ? `<div class="pdf-card"><div class="pdf-label">Photos intégrées</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:10px">${d.photos.map((p, i) => `<div style="border:1px solid #d1d5db;border-radius:8px;padding:6px"><img src="${p.src}" alt="Photo chantier ${i+1}" style="width:100%;height:150px;object-fit:cover;border-radius:6px"><div style="font-size:11px;color:#6b7280;margin-top:4px">Photo ${i+1}</div></div>`).join('')}</div></div>` : ''}
+      ${(d.photos || []).length ? `<div class="pdf-card"><div class="pdf-label">Photos intégrées (${d.photos.length})</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:10px">${d.photos.map((p, i) => `<div style="border:1px solid #d1d5db;border-radius:8px;padding:8px"><img src="${p.src}" alt="Photo ${i+1}" style="width:100%;height:160px;object-fit:cover;border-radius:6px"><div style="margin-top:6px"><div style="font-size:12px;font-weight:600;color:#1e3a5f">${p.label ? escapeHtml(p.label) : "Photo "+(i+1)}</div>${p.time ? `<div style="font-size:10px;color:#6b7280;margin-top:2px">🕐 ${p.time}</div>` : ""}</div></div>`).join('')}</div></div>` : ''}
       <div class="pdf-card"><div class="pdf-label">Remarques générales</div><div class="pdf-value">${nl2br(d.remarques)}</div></div>
       <div style="display:flex;justify-content:space-between;gap:24px;margin-top:28px;padding-top:14px;border-top:1px solid #d1d5db;align-items:flex-end;flex-wrap:wrap">
         <div>
@@ -2205,9 +2236,11 @@ function saveJournal() {
   if (!validateJournal(true)) return;
   const d = collectData();
 
-  // Incrémenter compteur
-  const key = `journal_count_${d.chantier}`;
-  localStorage.setItem(key, (parseInt(localStorage.getItem(key)||'0')+1).toString());
+  // Incrémenter compteur (par chantier + utilisateur)
+  const userCode = getUserCode();
+  const key = 'journal_count_' + d.chantier + '_' + userCode;
+  localStorage.setItem(key, (parseInt(localStorage.getItem(key) || '0') + 1).toString());
+  formDirty = false;
 
   // Sauvegarder personnel mémorisé
   savePersonnelToMemory(d.chantier);
@@ -2220,6 +2253,39 @@ function saveJournal() {
   clearDraft();
   showToast('✓ Journal enregistré avec succès');
   renderHistory();
+}
+
+// Task 20 — Dupliquer le journal précédent
+function duplicatePrevious() {
+  const hist = JSON.parse(localStorage.getItem('journals')||'[]');
+  if (!hist.length) { alert('Aucun journal enregistré à dupliquer.'); return; }
+  const d = hist[0];
+  if (!confirm('Pré-remplir le formulaire avec le dernier journal ('+d.date+') ?\nLes données actuelles seront écrasées.')) return;
+  suspendDraftSave = true;
+  const chSel = document.getElementById('f-chantier');
+  if (chSel && d.chantier) { chSel.value = d.chantier; onChantierChange(); }
+  setTimeout(() => {
+    const fields = {
+      'f-phase':d.phase,'f-avancement':d.avancement||0,
+      'f-travaux-demain':d.travauxDemain,'f-engins':d.engins,
+      'f-soustraitants':d.soustraitants,'f-topo-materiel':d.topoMateriel,
+      'f-remarques':d.remarques
+    };
+    Object.entries(fields).forEach(([id,val]) => {
+      const el = document.getElementById(id);
+      if (el && val !== undefined && val !== null) el.value = val;
+    });
+    const avEl = document.getElementById('f-avancement');
+    const avValEl = document.getElementById('f-avancement-val');
+    if (avEl && avValEl) avValEl.textContent = avEl.value + '%';
+    if (Array.isArray(d.personnel) && d.personnel.length) {
+      personnelData = d.personnel.map(p => ({...p, id:Date.now()+Math.random()}));
+      renderPersonnel();
+    }
+    suspendDraftSave = false;
+    formDirty = true;
+    showToast('📋 Formulaire pré-rempli depuis le journal du ' + d.date);
+  }, 800);
 }
 
 function sendJournalByEmail() {
@@ -2295,6 +2361,7 @@ function clearForm() {
   document.getElementById('preview-panel').innerHTML='';
   clearValidationState();
   clearDraft();
+  formDirty = false;
   document.getElementById('weather-banner').style.borderLeftColor='var(--blue2)';
   document.getElementById('w-icon').textContent='🌡';
   document.getElementById('w-temp').textContent='--°C';
@@ -2440,78 +2507,69 @@ function resetPlanningCells() {
 }
 
 function printPlanning() {
-  // Construire une zone d'impression propre
-  let zone = document.getElementById('print-planning-zone');
-  if (!zone) {
-    zone = document.createElement('div');
-    zone.id = 'print-planning-zone';
-    zone.style.cssText = 'display:none;background:white;color:#1a1a1a;font-family:Arial,sans-serif;font-size:11px';
-    document.body.appendChild(zone);
-  }
+  const planTab  = document.getElementById('tab-planning');
+  const header   = planTab.querySelector('.plan-header');
+  const alertBar = planTab.querySelector('.plan-alert');
+  const grid     = planTab.querySelector('.plan-week-grid');
+  const jalons   = planTab.querySelector('.jalons-table');
+  const meteo    = document.getElementById('plan-w-desc')?.textContent || '';
+  const logoSrc  = typeof WANTY_LOGO_B64 !== 'undefined' ? WANTY_LOGO_B64 : '';
+  const dateStr  = new Date().toLocaleDateString('fr-BE',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
 
-  // Récupérer le contenu du planning
-  const planTab = document.getElementById('tab-planning');
-  const header  = planTab.querySelector('.plan-header');
-  const alert   = planTab.querySelector('.plan-alert');
-  const grid    = planTab.querySelector('.plan-week-grid');
-  const jalons  = planTab.querySelector('.jalons-table');
-  const meteo   = document.getElementById('plan-w-desc')?.textContent || '';
+  const css = [
+    '@page{size:A4 landscape;margin:12mm}',
+    '*{box-sizing:border-box}',
+    'body{margin:0;font-family:Arial,sans-serif;font-size:9px;color:#1a1a1a;background:white}',
+    '.ph{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1a3a5c;padding-bottom:8px;margin-bottom:10px}',
+    '.ph h2{margin:0;font-size:14px;color:#1a3a5c}',
+    '.ph .meta{font-size:9px;color:#666;margin-top:2px}',
+    '.alert-bar{background:#1a3a5c;color:white;padding:5px 10px;font-size:9px;border-radius:3px;margin-bottom:8px}',
+    '.meteo-bar{background:#f0f4f8;padding:4px 8px;font-size:9px;color:#444;border-radius:3px;margin-bottom:10px}',
+    '.plan-week-grid{display:grid;grid-template-columns:120px repeat(6,1fr);gap:1px;background:#ccc;border:1px solid #ccc}',
+    '.plan-week-grid>div{background:white;padding:3px 4px;min-height:48px}',
+    '.head-col,.head-day{background:#1a3a5c!important;color:white!important;text-align:center;font-weight:700;font-size:9px;min-height:auto!important}',
+    '.sec-label{background:#2e4a7a!important;color:white!important;font-size:8px;padding:3px 6px;font-weight:700;grid-column:1/-1;min-height:auto!important}',
+    '.coord-cell{background:#e8f0fe!important}.prep-cell{background:#e8f5e9!important}',
+    '.secu-cell{background:#fff8e1!important}.bypass-cell{background:#f3e5f5!important}',
+    '.alert-cell{background:#fce4ec!important}.empty{background:#f9f9f9!important;color:#bbb!important;text-align:center}',
+    '.plan-badge{font-size:7px;font-weight:700;padding:1px 3px;border-radius:2px;display:inline-block;margin-bottom:2px;background:#ddd;color:#333}',
+    '.jalons-section{margin-top:12px}',
+    '.jalons-section h3{font-size:11px;color:#1a3a5c;border-bottom:1px solid #ccc;padding-bottom:4px;margin-bottom:6px}',
+    'table{width:100%;border-collapse:collapse;font-size:8.5px}',
+    'th{background:#1a3a5c;color:white;padding:4px 6px;text-align:left;font-size:8px}',
+    'td{border:1px solid #ddd;padding:3px 6px;vertical-align:top}',
+    'tr.critical td{background:#fce4ec!important}',
+    '.type-badge{font-size:7px;padding:1px 4px;border-radius:10px;white-space:nowrap}',
+    '[contenteditable]{outline:none!important}',
+    'strong{font-weight:700}'
+  ].join(' ');
 
-  // Récupérer le logo embarqué
-  const logoSrc = typeof WANTY_LOGO_B64 !== 'undefined' ? WANTY_LOGO_B64 : '';
+  const logoHtml = logoSrc
+    ? '<img src="' + logoSrc + '" style="height:32px;width:auto;object-fit:contain;margin-bottom:4px;display:block">'
+    : '<strong style="font-size:14px;color:#1a3a5c">GROUPE WANTY</strong>';
 
-  // Styles inline pour impression
-  const printCSS = `
-    body { margin: 0; padding: 0; }
-    #print-planning-zone { padding: 16px; background: white; }
-    .ph { display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #1a3a5c; padding-bottom:10px; margin-bottom:12px; }
-    .ph h2 { margin:0; font-size:16px; color:#1a3a5c; }
-    .ph .meta { font-size:10px; color:#666; margin-top:3px; }
-    .alert-bar { background:#1a3a5c; color:white; padding:6px 12px; font-size:10px; border-radius:4px; margin-bottom:10px; }
-    .meteo-bar { background:#f0f4f8; padding:5px 10px; font-size:10px; color:#444; border-radius:4px; margin-bottom:12px; }
-    .plan-week-grid { display:grid; grid-template-columns:130px repeat(6,1fr); gap:2px; font-size:9.5px; }
-    .head-col,.head-day { background:#1a3a5c!important; color:white!important; text-align:center; padding:5px 3px; font-weight:700; }
-    .sec-label { background:#2e4a7a; color:white; font-size:9px; padding:4px 6px; font-weight:600; grid-column:1/-1; }
-    .task { padding:4px 5px; border:1px solid #ddd; min-height:50px; vertical-align:top; font-size:9px; line-height:1.3; }
-    .coord-cell { background:#e8f0fe!important; }
-    .prep-cell  { background:#e8f5e9!important; }
-    .secu-cell  { background:#fff8e1!important; }
-    .bypass-cell{ background:#f3e5f5!important; }
-    .alert-cell { background:#fce4ec!important; }
-    .empty { background:#f9f9f9!important; color:#bbb!important; text-align:center; }
-    .plan-badge { font-size:8px; font-weight:700; padding:1px 4px; border-radius:3px; display:inline-block; margin-bottom:2px; }
-    table { width:100%; border-collapse:collapse; font-size:9px; margin-top:10px; }
-    th { background:#1a3a5c; color:white; padding:4px 6px; text-align:left; }
-    td { border:1px solid #ddd; padding:4px 6px; }
-    .critical td { background:#fce4ec; }
-  `;
+  const html = '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">'
+    + '<title>Planning CE Rhisnes</title><style>' + css + '</style></head><body>'
+    + '<div class="ph"><div>' + logoHtml
+    + '<h2>' + (header?.querySelector('h2')?.textContent || 'Planning Semaine') + '</h2>'
+    + '<div class="meta">' + (header?.querySelector('.meta')?.textContent || '') + '</div></div>'
+    + '<div style="text-align:right;font-size:9px;color:#666">'
+    + '<div style="color:#e67e22;font-weight:700">SEMAINE DE PRÉ-MOBILISATION</div>'
+    + '<div>Délai : 220 JO · 02/03/2026 → 01/03/2027</div>'
+    + '<div>Imprimé le ' + dateStr + '</div></div></div>'
+    + (alertBar ? '<div class="alert-bar">' + alertBar.textContent.trim() + '</div>' : '')
+    + '<div class="meteo-bar">🌡 Météo CE Rhisnes : ' + meteo + '</div>'
+    + (grid ? '<div class="plan-week-grid">' + grid.innerHTML + '</div>' : '')
+    + (jalons ? '<div class="jalons-section"><h3>📌 Jalons &amp; Réunions</h3><table>' + jalons.innerHTML + '</table></div>' : '')
+    + '</body></html>';
 
-  zone.innerHTML = `
-    <style>${printCSS}</style>
-    <div class="ph">
-      <div>
-        ${logoSrc ? `<img src="${logoSrc}" style="height:36px;width:auto;object-fit:contain;margin-bottom:6px;display:block">` : '<strong>GROUPE WANTY</strong>'}
-        <h2>${header?.querySelector('h2')?.textContent || 'Planning Semaine'}</h2>
-        <div class="meta">${header?.querySelector('.meta')?.textContent || ''}</div>
-      </div>
-      <div style="text-align:right;font-size:10px;color:#666">
-        <div style="color:#e67e22;font-weight:700">SEMAINE DE PRÉ-MOBILISATION</div>
-        <div>Délai : 220 JO · 02/03/26 → 01/03/27</div>
-        <div>Imprimé le ${new Date().toLocaleDateString('fr-BE')}</div>
-      </div>
-    </div>
-    ${alert ? `<div class="alert-bar">${alert.textContent.trim()}</div>` : ''}
-    <div class="meteo-bar">🌡 Météo : ${meteo}</div>
-    ${grid ? `<div class="plan-week-grid">${grid.innerHTML}</div>` : ''}
-    ${jalons ? `<table>${jalons.innerHTML}</table>` : ''}
-  `;
-
-  document.body.classList.add('print-planning');
-  window.print();
-  setTimeout(() => {
-    document.body.classList.remove('print-planning');
-    zone.innerHTML = '';
-  }, 1000);
+  const w = window.open('', '_blank', 'width=1200,height=850');
+  if (!w) { alert('Autorisez les popups pour imprimer le planning.'); return; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(function() { w.print(); setTimeout(function(){ w.close(); }, 500); }, 800);
 }
 
 function switchTab(name, btn) {
@@ -2577,8 +2635,74 @@ function refreshPlanningMeteo() {
   obs.observe(document.body, { childList: true, subtree: true });
 })();
 
+// ═══════════════════════════════════════════════════════════════
+//  MODULE NOM UTILISATEUR — éditable dans la barre d'état
+//  Mémorisé dans localStorage, synchronisé avec f-gestionnaire
+// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  MODULE UTILISATEUR — sélecteur + numérotation journaux par user
+// ═══════════════════════════════════════════════════════════════
+const USERS = {
+  'JJ': { name: 'Jean-Jacques',     role: 'Conducteur principal' },
+  'SL': { name: 'Stéphane Lassaux', role: 'Dirigeant'           },
+  'S1': { name: 'Chef équipe S1',   role: 'Chef de chantier'    },
+  'EV': { name: 'Chef équipe V',    role: "Chef d'équipe"       },
+  'LG': { name: 'Logistique',       role: 'Logisticien'         }
+};
+function getUserCode() {
+  return localStorage.getItem('userCode') || 'JJ';
+}
+function getUserName(code) {
+  return (USERS[code] || USERS['JJ']).name;
+}
+function buildJournalNum(chantier, userCode) {
+  if (!chantier || !userCode) return '';
+  const key = 'journal_count_' + chantier + '_' + userCode;
+  const n = parseInt(localStorage.getItem(key) || '0') + 1;
+  return chantier + '-' + userCode + '-J' + String(n).padStart(3, '0');
+}
+function updateJournalChip() {
+  const ch = document.getElementById('f-chantier') ? document.getElementById('f-chantier').value : '';
+  const numEl = document.getElementById('chip-journal-num');
+  if (!numEl) return;
+  numEl.textContent = ch ? buildJournalNum(ch, getUserCode()) : '—';
+}
+function loadUser() {
+  const code = getUserCode();
+  const sel = document.getElementById('user-select');
+  if (sel) sel.value = code;
+  const gest = document.getElementById('f-gestionnaire');
+  if (gest) gest.value = getUserName(code);
+  updateJournalChip();
+}
+function onUserChange() {
+  const sel = document.getElementById('user-select');
+  if (!sel) return;
+  const code = sel.value;
+  localStorage.setItem('userCode', code);
+  const gest = document.getElementById('f-gestionnaire');
+  if (gest) gest.value = getUserName(code);
+  const ch = document.getElementById('f-chantier') ? document.getElementById('f-chantier').value : '';
+  if (ch) document.getElementById('f-num-journal').value = buildJournalNum(ch, code);
+  updateJournalChip();
+  showToast('Utilisateur : ' + getUserName(code));
+}
+function goToHistory() {
+  const btn = document.querySelector('.tab-btn');
+  if (btn) switchTab('journal', btn);
+  setTimeout(() => {
+    const hp = document.getElementById('history-panel');
+    if (hp) { hp.style.display = 'block'; hp.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  }, 100);
+}
+function syncGestionnaireToChip(value) {
+  // Champ gestionnaire libre — pas de sync vers chip (select fixe)
+  localStorage.setItem('gestLibre', (value || '').trim());
+}
+
 renderPersonnel();
 renderSuiviTable();
+loadUser();
 loadPlanCells();
 renderHistory();
 initSignaturePad();
@@ -2586,6 +2710,25 @@ attachDraftListeners();
 renderDraftList();
 restoreDraft();
 if (!suiviData.length) addSuiviRow();
+
+// Task 19 — Backup automatique le lundi
+(function checkMondayBackup() {
+  const today = new Date();
+  if (today.getDay() !== 1) return;
+  const todayStr = today.toISOString().slice(0,10);
+  if (localStorage.getItem('lastBackupPrompt') === todayStr) return;
+  const hist = JSON.parse(localStorage.getItem('journals')||'[]');
+  if (!hist.length) return;
+  setTimeout(() => {
+    const ok = confirm(
+      '📦 Backup hebdomadaire — ' + todayStr + '\n\n' +
+      'Nous sommes lundi. Vous avez ' + hist.length + ' journal(s) enregistré(s).\n' +
+      'Voulez-vous télécharger un backup complet maintenant ?'
+    );
+    localStorage.setItem('lastBackupPrompt', todayStr);
+    if (ok) exportBackupJSON();
+  }, 2500);
+})();
 </script>
 
   <!-- Bannière installation PWA -->
