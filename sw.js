@@ -1,5 +1,5 @@
 // Service Worker — Journal WANTY
-const CACHE = 'journal-wanty-v5';
+const CACHE = 'journal-wanty-v7';
 
 const ASSETS = [
   './',
