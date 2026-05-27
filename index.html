@@ -38,6 +38,117 @@
     --mono:    'IBM Plex Mono', monospace;
     --sans:    'IBM Plex Sans', sans-serif;
   }
+
+  /* ══════════════════════════════════════════════
+     MODE JOUR — toutes les variables light
+  ══════════════════════════════════════════════ */
+  [data-theme="light"] {
+    --bg:      #f0f4f8;
+    --surface: #ffffff;
+    --card:    #f8fafc;
+    --border:  #cdd5df;
+    --text:    #1a2744;
+    --muted:   #56687a;
+  }
+  [data-theme="light"] body { background: var(--bg); color: var(--text); }
+
+  /* Transition fluide au changement de thème */
+  body, header, .status-bar, .tab-nav, .tab-btn,
+  .section, .section-header, .section-body,
+  .weather-banner, .status-chip, .draft-chip,
+  input, textarea, select, .btn-secondary,
+  .plan-week-grid, .plan-cell, .jalons-table td,
+  .jalons-table th, .history-item, #history-panel {
+    transition: background-color 0.25s ease, color 0.25s ease,
+                border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  /* Ajustements spécifiques mode jour */
+  [data-theme="light"] .tab-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  [data-theme="light"] .tab-btn {
+    color: var(--muted);
+  }
+  [data-theme="light"] .tab-btn.active {
+    color: var(--navy);
+    background: var(--bg);
+    border-bottom: 2px solid var(--blue2);
+  }
+  [data-theme="light"] .tab-btn:hover:not(.active) {
+    background: var(--card);
+  }
+  [data-theme="light"] .section-header {
+    background: linear-gradient(135deg, #e8eef5 0%, #dde6f0 100%);
+    border-color: var(--border);
+  }
+  [data-theme="light"] .weather-banner {
+    background: linear-gradient(135deg, #dce8f5 0%, #e8f0f8 100%);
+    border-left-color: var(--blue2);
+  }
+  [data-theme="light"] input,
+  [data-theme="light"] textarea {
+    background: #ffffff;
+    border-color: var(--border);
+    color: var(--text);
+  }
+  [data-theme="light"] input:focus,
+  [data-theme="light"] textarea:focus {
+    border-color: var(--blue2);
+    box-shadow: 0 0 0 2px rgba(46,117,182,0.15);
+  }
+  [data-theme="light"] select:not(#user-select):not(#f-chantier) {
+    background: #ffffff;
+    color: var(--text);
+    border-color: var(--border);
+  }
+  [data-theme="light"] #f-chantier,
+  [data-theme="light"] #f-phase,
+  [data-theme="light"] #f-intemperie-type,
+  [data-theme="light"] select.field-select {
+    background: #ffffff;
+    color: var(--text);
+    border-color: var(--border);
+  }
+  [data-theme="light"] .btn-secondary {
+    background: #e4eaf2;
+    border-color: #b8c8d8;
+    color: var(--navy);
+  }
+  [data-theme="light"] .btn-secondary:hover {
+    background: #d5e0ec;
+  }
+  [data-theme="light"] .history-item {
+    background: var(--card);
+    border-color: var(--border);
+  }
+  [data-theme="light"] .plan-cell {
+    border-color: var(--border);
+  }
+  [data-theme="light"] .plan-cell.head-day {
+    background: linear-gradient(135deg, #1e5fa8, #2e75b6);
+    color: #fff;
+  }
+  [data-theme="light"] .plan-cell.head-col {
+    background: #dde6f0;
+    color: var(--navy);
+  }
+  [data-theme="light"] .jalons-table th {
+    background: #1e5fa8;
+    color: #fff;
+  }
+  [data-theme="light"] .jalons-table td {
+    border-color: var(--border);
+  }
+  [data-theme="light"] .jalons-table tr:nth-child(even) td {
+    background: #f0f5fa;
+  }
+  [data-theme="light"] #theme-toggle {
+    background: #1a2744;
+    color: #f59e0b;
+    border-color: #2e3d5a;
+  }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
     font-family: var(--sans);
@@ -612,6 +723,15 @@
     </select>
   </div>
   <div class="draft-chip" id="draft-status" style="display:flex"><span>📝</span><span id="draft-status-text">Aucun brouillon</span></div>
+  <button id="theme-toggle" onclick="toggleTheme()"
+    title="Basculer mode jour / nuit"
+    style="margin-left:auto;background:var(--card);border:1px solid var(--border);
+           border-radius:6px;padding:4px 10px;font-size:15px;cursor:pointer;
+           color:var(--amber);font-family:var(--mono);line-height:1;
+           display:flex;align-items:center;gap:5px">
+    <span id="theme-icon">☀️</span>
+    <span id="theme-label" style="font-size:11px;color:var(--muted)">Jour</span>
+  </button>
 </div>
 
 
@@ -2797,8 +2917,39 @@ function syncGestionnaireToChip(value) {
   localStorage.setItem('gestLibre', (value || '').trim());
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  MODULE THÈME — Mode jour ☀️ / Mode nuit 🌙
+// ═══════════════════════════════════════════════════════════════
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon  = document.getElementById('theme-icon');
+  const label = document.getElementById('theme-label');
+  const meta  = document.querySelector('meta[name="theme-color"]');
+  if (theme === 'light') {
+    if (icon)  icon.textContent  = '🌙';
+    if (label) label.textContent = 'Nuit';
+    if (meta)  meta.content      = '#f0f4f8';
+  } else {
+    if (icon)  icon.textContent  = '☀️';
+    if (label) label.textContent = 'Jour';
+    if (meta)  meta.content      = '#1a2744';
+  }
+  localStorage.setItem('appTheme', theme);
+}
+function loadTheme() {
+  const saved = localStorage.getItem('appTheme') || 'dark';
+  applyTheme(saved);
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  showToast(next === 'light' ? '☀️ Mode jour activé' : '🌙 Mode nuit activé');
+}
+
 renderPersonnel();
 renderSuiviTable();
+loadTheme();
 loadUser();
 loadPlanCells();
 renderHistory();
