@@ -598,7 +598,7 @@
   }
   .plan-week-grid {
     display: grid;
-    grid-template-columns: 160px repeat(6, 1fr);
+    grid-template-columns: repeat(6, 1fr) 150px;
     gap: 2px; margin-bottom: 16px;
     overflow-x: auto;
   }
@@ -623,7 +623,7 @@
   .plan-cell.sec-label {
     background: var(--navy); color: var(--blue2);
     font-weight: 700; font-size: 11px;
-    grid-column: 1 / -1; padding: 8px 12px;
+    grid-column: 1 / 7; padding: 8px 12px;
     border-radius: 6px; align-items: center; min-height: 0;
     letter-spacing: .3px;
   }
@@ -682,7 +682,7 @@
   .synth-table td.status-ok { color: var(--muted); font-family: var(--mono); font-size: 10px; }
 
   @media (max-width:640px) {
-    .plan-week-grid { grid-template-columns: 120px repeat(6, minmax(90px,1fr)); }
+    .plan-week-grid { grid-template-columns: repeat(6, minmax(90px,1fr)) 120px; }
     .tab-btn { padding: 11px 14px; font-size: 12px; }
   }
 
@@ -1261,31 +1261,34 @@
       <span class="toggle" style="margin-left:auto">▼</span>
     </div>
     <div class="section-body" style="padding:12px;overflow-x:auto">
-      <!-- Sélecteur de semaine — au-dessus de la grille -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;
-                  background:var(--surface);border:1px solid var(--border);
-                  border-radius:8px;padding:8px 14px">
-        <span style="font-size:11px;color:var(--muted);font-family:var(--mono)">📅 SEMAINE :</span>
-        <input id="plan-semaine-input" type="number" min="1" max="53" value="22"
-          style="width:52px;background:var(--navy);border:1px solid var(--blue2);border-radius:6px;
-                 color:var(--blue2);font-family:var(--mono);font-size:14px;font-weight:700;
-                 text-align:center;padding:4px 4px;cursor:pointer"
-          title="Numéro de semaine ISO — les dates se mettent à jour automatiquement"
-          oninput="updatePlanningWeek(this.value)">
-        <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="plan-semaine-label">→ saisir un numéro</span>
-        <span style="margin-left:auto;font-size:10px;color:var(--muted);font-style:italic">Les colonnes et jalons se mettent à jour automatiquement</span>
+      <!-- Indicateur de plage de dates -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">📅</span>
+        <span style="font-size:11px;color:var(--blue2);font-family:var(--mono);font-weight:600" id="plan-semaine-label">—</span>
+        <span style="font-size:10px;color:var(--muted);font-style:italic">· Modifier le n° dans la colonne de droite</span>
       </div>
 
       <div class="plan-week-grid" style="min-width:780px">
 
-        <!-- En-têtes -->
-        <div class="plan-cell head-col">DOMAINE</div>
+        <!-- En-têtes : 6 jours + sélecteur de semaine à droite (col DIM) -->
         <div class="plan-cell head-day" id="plan-hd-0"><div class="date" id="plan-hd-0-d">26</div><div id="plan-hd-0-wd">MAR</div><div id="plan-hd-0-m">Mai</div></div>
         <div class="plan-cell head-day" id="plan-hd-1"><div class="date" id="plan-hd-1-d">27</div><div id="plan-hd-1-wd">MER</div><div id="plan-hd-1-m">Mai</div></div>
         <div class="plan-cell head-day" id="plan-hd-2"><div class="date" id="plan-hd-2-d">28</div><div id="plan-hd-2-wd">JEU</div><div id="plan-hd-2-m">Mai</div></div>
         <div class="plan-cell head-day" id="plan-hd-3"><div class="date" id="plan-hd-3-d">29</div><div id="plan-hd-3-wd">VEN</div><div id="plan-hd-3-m">Mai</div></div>
         <div class="plan-cell head-day" id="plan-hd-4" style="background:rgba(46,117,182,.3)"><div class="date" id="plan-hd-4-d">30</div><div id="plan-hd-4-wd">SAM</div><div id="plan-hd-4-m">Mai</div></div>
         <div class="plan-cell head-day" id="plan-hd-5" style="background:rgba(46,117,182,.2)"><div class="date" id="plan-hd-5-d">31</div><div id="plan-hd-5-wd">DIM</div><div id="plan-hd-5-m">Mai</div></div>
+        <!-- Sélecteur de semaine — colonne DIM (pas d'activité chantier) -->
+        <div class="plan-cell head-col" style="flex-direction:column;gap:5px;justify-content:center;align-items:center">
+          <span style="font-size:9px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px">Semaine</span>
+          <input id="plan-semaine-input" type="number" min="1" max="53" value="22"
+            style="width:52px;background:var(--navy);border:1px solid var(--blue2);border-radius:6px;
+                   color:var(--blue2);font-family:var(--mono);font-size:15px;font-weight:700;
+                   text-align:center;padding:4px 2px;cursor:pointer"
+            title="Numéro de semaine ISO"
+            onchange="updatePlanningWeek(this.value)"
+            onkeydown="if(event.key==='Enter'){updatePlanningWeek(this.value);this.blur();}">
+          <span style="font-size:9px;color:var(--muted);font-family:var(--mono)">↑ saisir</span>
+        </div>
 
         <!-- SECTION COORDINATION -->
         <div class="plan-cell sec-label">🤝 COORDINATION & RÉUNIONS</div>
