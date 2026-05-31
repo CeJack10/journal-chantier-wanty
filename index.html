@@ -1188,7 +1188,7 @@
   <div class="plan-header">
     <div>
       <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:4px">CE RHISNES · SWDE/BE/235/NAM/I.004762/01 · IND. D – 20/05/2026</div>
-      <h2>Planning Semaine 22 &nbsp;·&nbsp; 26 – 30 Mai 2026</h2>
+      <h2 id="plan-week-title-h2">Planning Semaine 22 &nbsp;·&nbsp; 26 – 30 Mai 2026</h2>
       <div class="meta">Conducteur principal : Jean-Jacques &nbsp;|&nbsp; Dirigeant : Stéphane Lassaux</div>
     </div>
     <div style="text-align:right">
@@ -1231,30 +1231,61 @@
   <div class="plan-edit-hint" style="font-size:10px;color:#8b949e;text-align:right;padding:0 4px 6px;font-style:italic">
     ✏️ Cliquez dans une cellule pour modifier · Sauvegarde automatique
   </div>
-  <div class="plan-alert">
+  <div class="plan-alert" id="plan-alert">
     ⚡ <strong>BY-PASS ACTIF</strong> depuis le 11/05/26 jusqu'au 21/10/26 &nbsp;|&nbsp;
-    Tâche 45 démarre le <strong>01/06/26</strong> (Ouverture top CE + escalier colimaçon) &nbsp;|&nbsp;
-    Tâche 21 démarre le <strong>08/06/26</strong> (Montage échafaudage + lift)
+    Tâche 45 démarre le <strong id="bypass-t45-date">01/06/26</strong> <span id="bypass-t45-label">(Ouverture top CE + escalier colimaçon)</span> &nbsp;|&nbsp;
+    Tâche 21 démarre le <strong id="bypass-t21-date">08/06/26</strong> <span id="bypass-t21-label">(Montage échafaudage + lift)</span>
+    <span id="bypass-week-status" style="margin-left:10px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700"></span>
+  </div>
+
+  <!-- TÂCHES ACTIVES DEPUIS SYNTHÈSE -->
+  <div class="section" style="margin-bottom:12px">
+    <div class="section-header" onclick="toggleSection(this)" style="cursor:pointer">
+      <span class="icon">🔗</span>
+      <h3 id="taches-actives-title">Tâches actives — Planning global</h3>
+      <span style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-left:8px">depuis synthèse</span>
+      <span class="toggle" style="margin-left:auto">▼</span>
+    </div>
+    <div class="section-body" style="padding:12px">
+      <div id="plan-taches-actives">
+        <div style="font-size:11px;color:var(--muted);text-align:center;padding:8px;font-style:italic">Chargement…</div>
+      </div>
+    </div>
   </div>
 
   <!-- GRILLE PLANNING -->
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)" style="cursor:pointer">
       <span class="icon">📅</span>
-      <h3>Planning jour par jour — Semaine 26-30 mai</h3>
+      <h3 id="plan-week-title-h3">Planning jour par jour — Semaine 26-30 mai</h3>
       <span class="toggle" style="margin-left:auto">▼</span>
     </div>
     <div class="section-body" style="padding:12px;overflow-x:auto">
+      <!-- Sélecteur de semaine — au-dessus de la grille -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;
+                  background:var(--surface);border:1px solid var(--border);
+                  border-radius:8px;padding:8px 14px">
+        <span style="font-size:11px;color:var(--muted);font-family:var(--mono)">📅 SEMAINE :</span>
+        <input id="plan-semaine-input" type="number" min="1" max="53" value="22"
+          style="width:52px;background:var(--navy);border:1px solid var(--blue2);border-radius:6px;
+                 color:var(--blue2);font-family:var(--mono);font-size:14px;font-weight:700;
+                 text-align:center;padding:4px 4px;cursor:pointer"
+          title="Numéro de semaine ISO — les dates se mettent à jour automatiquement"
+          oninput="updatePlanningWeek(this.value)">
+        <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="plan-semaine-label">→ saisir un numéro</span>
+        <span style="margin-left:auto;font-size:10px;color:var(--muted);font-style:italic">Les colonnes et jalons se mettent à jour automatiquement</span>
+      </div>
+
       <div class="plan-week-grid" style="min-width:780px">
 
         <!-- En-têtes -->
-        <div class="plan-cell head-col">Domaine</div>
-        <div class="plan-cell head-day"><div class="date">26</div><div>MAR</div><div>Mai</div></div>
-        <div class="plan-cell head-day"><div class="date">27</div><div>MER</div><div>Mai</div></div>
-        <div class="plan-cell head-day"><div class="date">28</div><div>JEU</div><div>Mai</div></div>
-        <div class="plan-cell head-day"><div class="date">29</div><div>VEN</div><div>Mai</div></div>
-        <div class="plan-cell head-day" style="background:rgba(46,117,182,.3)"><div class="date">30</div><div>SAM</div><div>Mai</div></div>
-        <div class="plan-cell head-day" style="background:rgba(46,117,182,.2)"><div class="date">31</div><div>DIM</div><div>Mai</div></div>
+        <div class="plan-cell head-col">DOMAINE</div>
+        <div class="plan-cell head-day" id="plan-hd-0"><div class="date" id="plan-hd-0-d">26</div><div id="plan-hd-0-wd">MAR</div><div id="plan-hd-0-m">Mai</div></div>
+        <div class="plan-cell head-day" id="plan-hd-1"><div class="date" id="plan-hd-1-d">27</div><div id="plan-hd-1-wd">MER</div><div id="plan-hd-1-m">Mai</div></div>
+        <div class="plan-cell head-day" id="plan-hd-2"><div class="date" id="plan-hd-2-d">28</div><div id="plan-hd-2-wd">JEU</div><div id="plan-hd-2-m">Mai</div></div>
+        <div class="plan-cell head-day" id="plan-hd-3"><div class="date" id="plan-hd-3-d">29</div><div id="plan-hd-3-wd">VEN</div><div id="plan-hd-3-m">Mai</div></div>
+        <div class="plan-cell head-day" id="plan-hd-4" style="background:rgba(46,117,182,.3)"><div class="date" id="plan-hd-4-d">30</div><div id="plan-hd-4-wd">SAM</div><div id="plan-hd-4-m">Mai</div></div>
+        <div class="plan-cell head-day" id="plan-hd-5" style="background:rgba(46,117,182,.2)"><div class="date" id="plan-hd-5-d">31</div><div id="plan-hd-5-wd">DIM</div><div id="plan-hd-5-m">Mai</div></div>
 
         <!-- SECTION COORDINATION -->
         <div class="plan-cell sec-label">🤝 COORDINATION & RÉUNIONS</div>
@@ -1448,75 +1479,45 @@
     </div>
   </div>
 
-  <!-- JALONS ET RÉUNIONS -->
+  <!-- JALONS ET RÉUNIONS — DYNAMIQUE PAR SEMAINE -->
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)" style="cursor:pointer">
       <span class="icon">📌</span>
-      <h3>Jalons & Réunions de la semaine</h3>
-      <span class="badge">6 événements</span>
+      <h3 id="jalons-title">Jalons & Réunions de la semaine</h3>
+      <span class="badge" id="jalons-count">0 événements</span>
       <span class="toggle" style="margin-left:auto">▼</span>
     </div>
     <div class="section-body" style="padding:0">
-      <table class="jalons-table">
+      <!-- Barre d'actions jalons -->
+      <div style="display:flex;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap;align-items:center">
+        <span style="font-size:10px;color:var(--muted);font-family:var(--mono);flex:1">
+          📅 Données propres à chaque semaine — sauvegarde automatique
+        </span>
+        <button onclick="jalonsAddRow()"
+          style="background:rgba(22,163,74,.2);color:var(--green);border:1px solid rgba(22,163,74,.3);
+                 border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">
+          + Ajouter ligne
+        </button>
+        <button onclick="jalonsReset()"
+          style="background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.3);
+                 border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">
+          ↺ Réinitialiser semaine
+        </button>
+      </div>
+      <table class="jalons-table" id="jalons-tbody-table">
         <thead>
           <tr>
-            <th style="width:80px">Jour</th>
-            <th style="width:60px">Heure</th>
-            <th style="width:90px">Type</th>
+            <th style="width:110px">Jour</th>
+            <th style="width:55px">Heure</th>
+            <th style="width:95px">Type</th>
             <th>Description</th>
-            <th style="width:140px">Lieu</th>
+            <th style="width:130px">Lieu</th>
             <th style="width:80px">Statut</th>
+            <th style="width:28px"></th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc1" oninput="savePlanCell('jc1',this)"><strong>Mardi 26</strong></td>
-            <td style="cursor:text;font-family:var(--mono)" contenteditable="true" data-cell-id="jc2" oninput="savePlanCell('jc2',this)">08h00</td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc3" oninput="savePlanCell('jc3',this)"><span class="type-badge" style="background:rgba(46,117,182,.25);color:#93c5fd">RÉUNION</span></td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc4" oninput="savePlanCell('jc4',this)">Réunion lancement pré-mobilisation — Conducteur + Chefs d'équipe + Coord. Sécu</td>
-            <td style="cursor:text;font-size:11px;color:var(--muted)" contenteditable="true" data-cell-id="jc5" oninput="savePlanCell('jc5',this)">Bureau chantier</td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc6" oninput="savePlanCell('jc6',this)"><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
-          </tr>
-          <tr>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc7" oninput="savePlanCell('jc7',this)"><strong>Mercredi 27</strong></td>
-            <td style="cursor:text;font-family:var(--mono)" contenteditable="true" data-cell-id="jc8" oninput="savePlanCell('jc8',this)">08h30</td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc9" oninput="savePlanCell('jc9',this)"><span class="type-badge" style="background:rgba(124,58,237,.25);color:#c4b5fd">VISITE</span></td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc10" oninput="savePlanCell('jc10',this)">Visite complète CE Rhisnes — Relevé accès top CE, état escalier colimaçon, zone échafaudage</td>
-            <td style="cursor:text;font-size:11px;color:var(--muted)" contenteditable="true" data-cell-id="jc11" oninput="savePlanCell('jc11',this)">CE Rhisnes – Suarlée</td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc12" oninput="savePlanCell('jc12',this)"><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
-          </tr>
-          <tr>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc13" oninput="savePlanCell('jc13',this)"><strong>Jeudi 28</strong></td>
-            <td style="cursor:text;font-family:var(--mono)" contenteditable="true" data-cell-id="jc14" oninput="savePlanCell('jc14',this)">14h00</td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc15" oninput="savePlanCell('jc15',this)"><span class="type-badge" style="background:rgba(245,158,11,.25);color:#fcd34d">SÉCU</span></td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc16" oninput="savePlanCell('jc16',this)">Coordination sécurité — Mise à jour PSS pour tâches 45 et 21 (travaux en hauteur, levage)</td>
-            <td style="cursor:text;font-size:11px;color:var(--muted)" contenteditable="true" data-cell-id="jc17" oninput="savePlanCell('jc17',this)">Bureau chantier</td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc18" oninput="savePlanCell('jc18',this)"><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
-          </tr>
-          <tr>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc19" oninput="savePlanCell('jc19',this)"><strong>Vendredi 29</strong></td>
-            <td style="cursor:text;font-family:var(--mono)" contenteditable="true" data-cell-id="jc20" oninput="savePlanCell('jc20',this)">09h00</td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc21" oninput="savePlanCell('jc21',this)"><span class="type-badge" style="background:rgba(46,117,182,.25);color:#93c5fd">SWDE</span></td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc22" oninput="savePlanCell('jc22',this)">Contact SWDE Exploitation — Suivi by-pass actif + confirmation planning vidange 03/08/26</td>
-            <td style="cursor:text;font-size:11px;color:var(--muted)" contenteditable="true" data-cell-id="jc23" oninput="savePlanCell('jc23',this)">Téléphone / Teams</td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc24" oninput="savePlanCell('jc24',this)"><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
-          </tr>
-          <tr class="critical">
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc25" oninput="savePlanCell('jc25',this)"><strong>Samedi 30</strong></td>
-            <td style="cursor:text;font-family:var(--mono)" contenteditable="true" data-cell-id="jc26" oninput="savePlanCell('jc26',this)">14h00</td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc27" oninput="savePlanCell('jc27',this)"><span class="type-badge" style="background:rgba(220,38,38,.3);color:#fca5a5">⚡ JALON</span></td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc28" oninput="savePlanCell('jc28',this)"><strong>Validation plans T45 (ouverture top CE) + plan échafaudage T21 → GO pour 01/06</strong></td>
-            <td style="cursor:text;font-size:11px" contenteditable="true" data-cell-id="jc29" oninput="savePlanCell('jc29',this)">Bureau chantier / BE</td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc30" oninput="savePlanCell('jc30',this)"><span class="type-badge" style="background:rgba(220,38,38,.25);color:#fca5a5">CRITIQUE</span></td>
-          </tr>
-          <tr>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc31" oninput="savePlanCell('jc31',this)"><strong>Samedi 30</strong></td>
-            <td style="cursor:text;font-family:var(--mono)" contenteditable="true" data-cell-id="jc32" oninput="savePlanCell('jc32',this)">16h00</td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc33" oninput="savePlanCell('jc33',this)"><span class="type-badge" style="background:rgba(46,117,182,.25);color:#93c5fd">RAPPORT</span></td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc34" oninput="savePlanCell('jc34',this)">Rapport hebdomadaire — Synthèse préparatifs, points ouverts, planning semaine 01/06</td>
-            <td style="cursor:text;font-size:11px;color:var(--muted)" contenteditable="true" data-cell-id="jc35" oninput="savePlanCell('jc35',this)">Bureau chantier</td>
-            <td style="cursor:text;" contenteditable="true" data-cell-id="jc36" oninput="savePlanCell('jc36',this)"><span class="type-badge" style="background:rgba(22,163,74,.2);color:#86efac">PLANIFIÉ</span></td>
-          </tr>
+        <tbody id="jalons-tbody">
+          <!-- Rempli dynamiquement par JS -->
         </tbody>
       </table>
     </div>
@@ -1558,69 +1559,12 @@
             <th style="width:90px">Début</th>
             <th style="width:90px">Fin</th>
             <th style="width:55px">Durée</th>
-            <th style="width:150px">Statut</th>
+            <th style="width:130px">Statut</th>
+            <th style="width:36px" title="Marquer terminé">✔</th>
           </tr>
         </thead>
         <tbody>
-
-          <tr class="sec-row"><td colspan="6">── INSPECTION CE RHISNES ──</td></tr>
-          <tr class="done"><td style="font-family:var(--mono);font-size:10px">5</td><td>Inspection CE Rhisnes (global)</td><td>28/01/26</td><td>26/04/27</td><td>283 j</td><td class="status-ok">Récapitulatif</td></tr>
-          <tr class="done"><td style="font-family:var(--mono);font-size:10px">6</td><td>Réalisation de l'inspection in situ</td><td>02/03/26</td><td>18/03/26</td><td>13 j</td><td class="status-done">✔ TERMINÉ</td></tr>
-          <tr class="done"><td style="font-family:var(--mono);font-size:10px">7</td><td>Rapport + MAJ NC du CE Rhisnes</td><td>19/03/26</td><td>01/04/26</td><td>10 j</td><td class="status-done">✔ TERMINÉ</td></tr>
-          <tr class="done"><td style="font-family:var(--mono);font-size:10px">8</td><td>Décision SWDE travaux de renforcement</td><td>02/04/26</td><td>09/04/26</td><td>5 j</td><td class="status-done">✔ TERMINÉ</td></tr>
-          <tr class="done"><td style="font-family:var(--mono);font-size:10px">9</td><td>Éventuels travaux de renforcement</td><td>10/04/26</td><td>04/05/26</td><td>12 j</td><td class="status-done">✔ TERMINÉ</td></tr>
-
-          <tr class="sec-row"><td colspan="6">── DIVERS ──</td></tr>
-          <tr class="done"><td style="font-family:var(--mono);font-size:10px">14</td><td>Réparations ponctuelles béton (plafond cave)</td><td>28/01/26</td><td>03/02/26</td><td>5 j</td><td class="status-done">✔ TERMINÉ</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">15</td><td>Protections des bétons de la cave</td><td>04/08/26</td><td>17/08/26</td><td>10 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">16</td><td>Revêtement sol RDC + trappe + sterfput (Phase I)</td><td>11/12/26</td><td>17/12/26</td><td>5 j</td><td class="status-ok">À venir</td></tr>
-
-          <tr class="sec-row"><td colspan="6">── CONTRAINTE BY-PASS (ACTIF) ──</td></tr>
-          <tr class="alert"><td style="font-family:var(--mono);font-size:10px">40</td><td>Fenêtre by-pass CE Rhisnes</td><td>11/05/26</td><td>21/10/26</td><td>100 j</td><td class="status-alert">⚡ ACTIF</td></tr>
-
-          <tr class="sec-row"><td colspan="6">── PARTIE EXTÉRIEURE ──</td></tr>
-          <tr class="alert"><td style="font-family:var(--mono);font-size:10px">21</td><td>Montage échafaudage + lift</td><td>08/06/26</td><td>10/07/26</td><td>25 j</td><td class="status-alert">⚡ Dans 14j</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">22</td><td>Démontage bardage + isolation sphère + garde-corps</td><td>03/08/26</td><td>14/08/26</td><td>10 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">23</td><td>Inspection extérieure + planification réparations (tronc puis sphère)</td><td>10/08/26</td><td>14/08/26</td><td>5 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">24</td><td>Remplacement éventuel pattes fixation bardage</td><td>17/08/26</td><td>01/09/26</td><td>12 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">25</td><td>Thermo-bâchage de la sphère</td><td>26/08/26</td><td>08/09/26</td><td>10 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">26</td><td>Pose capteurs/câblage monitoring (Phase I)</td><td>26/08/26</td><td>08/09/26</td><td>10 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">27</td><td>Pose protection contre corrosion — sphère</td><td>09/09/26</td><td>06/10/26</td><td>20 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">28</td><td>Pose capteurs/câblage monitoring (Phase II)</td><td>30/09/26</td><td>13/10/26</td><td>10 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">29</td><td>Pose isolation autour de la sphère</td><td>07/10/26</td><td>15/10/26</td><td>7 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">30</td><td>Pose bardage autour de la sphère</td><td>16/10/26</td><td>18/01/27</td><td>50 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">31</td><td>Démontage thermo-bâchage sphère + bâchage tronc ext.</td><td>12/01/27</td><td>01/02/27</td><td>15 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">32</td><td>Pose protection extérieure contre corrosion</td><td>02/02/27</td><td>19/03/27</td><td>34 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">33</td><td>Inspection générale avant démontage échafaudage</td><td>22/03/27</td><td>26/03/27</td><td>5 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">34</td><td>Démontage échafaudage</td><td>29/03/27</td><td>16/04/27</td><td>15 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">35</td><td>Vérification réseau dégouttage</td><td>19/04/27</td><td>22/04/27</td><td>4 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">36</td><td>Démontage empierrement + trottoir béton périphérique</td><td>19/04/27</td><td>26/04/27</td><td>6 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">37</td><td>Remise en état général du site</td><td>19/04/27</td><td>26/04/27</td><td>6 j</td><td class="status-ok">À venir</td></tr>
-
-          <tr class="sec-row"><td colspan="6">── PARTIE INTÉRIEURE ──</td></tr>
-          <tr class="done"><td style="font-family:var(--mono);font-size:10px">43</td><td>Inspection + planification réparations structurelles</td><td>05/03/26</td><td>25/03/26</td><td>15 j</td><td class="status-done">✔ TERMINÉ</td></tr>
-          <tr class="done"><td style="font-family:var(--mono);font-size:10px">44</td><td>Réfection conduites condensat + structures portantes + trappes</td><td>28/01/26</td><td>17/02/26</td><td>15 j</td><td class="status-done">✔ TERMINÉ</td></tr>
-          <tr class="alert"><td style="font-family:var(--mono);font-size:10px">45</td><td><strong>Ouverture top CE + Démontage escalier colimaçon + Réfection trappe</strong></td><td>01/06/26</td><td>19/06/26</td><td>15 j</td><td class="status-alert">⚡ Dans 7j !</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">46</td><td>By-pass + vidange CE</td><td>03/08/26</td><td>04/08/26</td><td>1 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">47</td><td>Démontage tuyauteries + alimentations électriques</td><td>04/08/26</td><td>17/08/26</td><td>10 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">48</td><td>Pose fixations nouvelles canalisations + câblage éclairage</td><td>18/08/26</td><td>24/08/26</td><td>5 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">49</td><td>Nettoyage fond réservoir (Travaux supplémentaires)</td><td>04/08/26</td><td>07/08/26</td><td>3 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">50</td><td>Pose échafaudage dans le réservoir</td><td>07/08/26</td><td>21/08/26</td><td>10 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">51</td><td>Inspection + réparations éventuelles (liée extérieur)</td><td>21/08/26</td><td>01/09/26</td><td>8 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">52</td><td>Pose fixations échelles accès top CE + cuve</td><td>21/08/26</td><td>25/08/26</td><td>3 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">53</td><td>Pose revêtement epoxy dans le réservoir</td><td>26/08/26</td><td>11/09/26</td><td>13 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">54</td><td>Inspection générale du réservoir</td><td>14/09/26</td><td>14/09/26</td><td>1 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">55</td><td>Démontage échafaudage dans le réservoir</td><td>15/09/26</td><td>22/09/26</td><td>6 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">56</td><td>Pose échelles cuve + top CE</td><td>18/09/26</td><td>24/09/26</td><td>5 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">57</td><td>Protection intérieure corrosion — fût + escalier colimaçon</td><td>25/09/26</td><td>01/10/26</td><td>5 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">58</td><td>Protection intérieure corrosion — fût + escaliers + tuyau de décharge</td><td>02/10/26</td><td>19/11/26</td><td>28 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">59</td><td>Pose nouvelles tuyauteries</td><td>20/11/26</td><td>08/12/26</td><td>13 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">60</td><td>Nettoyage & Désinfection cuve (via nouvelle échelle crinoline)</td><td>25/11/26</td><td>30/11/26</td><td>4 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">61</td><td>Raccordement sur existant</td><td>09/12/26</td><td>11/12/26</td><td>3 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">62</td><td>Pose nouvelle porte + nouveaux hublots</td><td>27/11/26</td><td>10/12/26</td><td>10 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">63</td><td>Travaux équipements généraux partie EM</td><td>14/12/26</td><td>05/03/27</td><td>50 j</td><td class="status-ok">À venir</td></tr>
-          <tr><td style="font-family:var(--mono);font-size:10px">64</td><td>Connexion système de monitoring</td><td>08/03/27</td><td>14/04/27</td><td>28 j</td><td class="status-ok">À venir</td></tr>
-
+          <!-- Rempli dynamiquement par renderSyntheseTable() -->
         </tbody>
       </table>
     </div>
@@ -2597,8 +2541,730 @@ function showToast(msg, type='green') {
 //  ONGLETS
 // ═══════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+//  PLANNING — Sélecteur de semaine ISO avec mise à jour automatique
+// ═══════════════════════════════════════════════════════════════════
+
+// Jalons fixes du projet (dates réelles — à mettre à jour si besoin)
+const JALONS_PLANNING = [
+  { id:'t45', date: new Date(2026, 5,  1), label: '(Ouverture top CE + escalier colimaçon)', tache: '45' },
+  { id:'t21', date: new Date(2026, 5,  8), label: '(Montage échafaudage + lift)',             tache: '21' },
+];
+
+const JOURS_FR   = ['DIM','LUN','MAR','MER','JEU','VEN','SAM'];
+const MOIS_FR    = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+const MOIS_LONG  = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+/**
+ * Retourne le lundi de la semaine ISO `weekNum` de l'année en cours.
+ */
+function getMondayOfISOWeek(weekNum, year) {
+  year = year || new Date().getFullYear();
+  // Jan 4 est toujours dans la semaine 1
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const dayOfWeek = jan4.getUTCDay() || 7; // 1=lun … 7=dim
+  const monday1 = new Date(jan4);
+  monday1.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1);
+  const monday = new Date(monday1);
+  monday.setUTCDate(monday1.getUTCDate() + (weekNum - 1) * 7);
+  return monday;
+}
+
+function fmtDateFR(d) {
+  return ('0'+d.getUTCDate()).slice(-2) + '/' + ('0'+(d.getUTCMonth()+1)).slice(-2) + '/' + String(d.getUTCFullYear()).slice(-2);
+}
+
+function updatePlanningWeek(weekNum) {
+  weekNum = parseInt(weekNum, 10);
+  if (!weekNum || weekNum < 1 || weekNum > 53) return;
+
+  const year  = new Date().getFullYear();
+  const monday = getMondayOfISOWeek(weekNum, year);
+
+  // Les 6 jours affichés : Lun → Sam (index 0..5, offset +1 pour SAM)
+  // Correspondance colonnes : col0=LUN col1=MAR col2=MER col3=JEU col4=VEN col5=SAM
+  // Mais le planning actuel montre MAR→DIM (6 jours à partir de mardi)
+  // → on garde le même principe : 6 jours à partir du LUNDI
+  const OFFSETS = [0, 1, 2, 3, 4, 5]; // LUN MAR MER JEU VEN SAM
+  const NOMS    = ['LUN','MAR','MER','JEU','VEN','SAM'];
+  const IS_WEEKEND = [false, false, false, false, false, true];
+
+  // Calculer la plage de dates pour le titre
+  const dateDebut = new Date(monday);
+  const dateFin   = new Date(monday); dateFin.setUTCDate(monday.getUTCDate() + 5);
+
+  // Vérifier si les deux dates sont dans le même mois
+  let plageLabel;
+  if (dateDebut.getUTCMonth() === dateFin.getUTCMonth()) {
+    plageLabel = dateDebut.getUTCDate() + ' – ' + dateFin.getUTCDate() + ' ' + MOIS_LONG[dateFin.getUTCMonth()];
+  } else {
+    plageLabel = dateDebut.getUTCDate() + ' ' + MOIS_LONG[dateDebut.getUTCMonth()] +
+                 ' – ' + dateFin.getUTCDate() + ' ' + MOIS_LONG[dateFin.getUTCMonth()];
+  }
+
+  // Mettre à jour les 6 cellules en-tête
+  OFFSETS.forEach((offset, i) => {
+    const day = new Date(monday);
+    day.setUTCDate(monday.getUTCDate() + offset);
+
+    const dEl  = document.getElementById('plan-hd-' + i + '-d');
+    const wdEl = document.getElementById('plan-hd-' + i + '-wd');
+    const mEl  = document.getElementById('plan-hd-' + i + '-m');
+    if (dEl)  dEl.textContent  = day.getUTCDate();
+    if (wdEl) wdEl.textContent = NOMS[i];
+    if (mEl)  mEl.textContent  = MOIS_FR[day.getUTCMonth()];
+
+    // Style week-end
+    const cell = document.getElementById('plan-hd-' + i);
+    if (cell) {
+      if (i === 4) cell.style.background = 'rgba(46,117,182,.3)'; // VEN → SAM couleur
+      else if (i === 5) cell.style.background = 'rgba(46,117,182,.2)';
+      else cell.style.background = '';
+    }
+  });
+
+  // Mettre à jour les titres
+  const h3 = document.getElementById('plan-week-title-h3');
+  if (h3) h3.textContent = 'Planning jour par jour — Semaine ' + plageLabel;
+
+  const h2 = document.getElementById('plan-week-title-h2');
+  if (h2) h2.innerHTML = 'Planning Semaine&nbsp;' + weekNum + '&nbsp;&middot;&nbsp;' + plageLabel + '&nbsp;' + year;
+
+  // Mettre à jour la bande BY-PASS selon les jalons
+  updateBypassAlert(weekNum, monday, dateFin);
+
+  // Mettre à jour les jalons & réunions
+  renderJalons(weekNum);
+
+  // Tâches actives depuis synthèse
+  renderTachesActivesPlanning(weekNum);
+
+  // Mettre à jour le label de la barre sélecteur
+  const lblEl = document.getElementById('plan-semaine-label');
+  if (lblEl) {
+    const year = new Date().getFullYear();
+    const mon  = getMondayOfISOWeek(weekNum, year);
+    const sat  = new Date(mon); sat.setUTCDate(mon.getUTCDate() + 5);
+    lblEl.textContent = '→ ' + mon.getUTCDate() + ' ' + MOIS_FR[mon.getUTCMonth()] +
+                        ' au ' + sat.getUTCDate() + ' ' + MOIS_FR[sat.getUTCMonth()] + ' ' + year;
+  }
+
+  // Persister le choix
+  localStorage.setItem('planningWeekNum', weekNum);
+}
+
+function updateBypassAlert(weekNum, mondayDate, saturdayDate) {
+  const statusEl = document.getElementById('bypass-week-status');
+  if (!statusEl) return;
+
+  // Fenêtre by-pass : 11/05/26 → 21/10/26
+  const bypassStart = new Date(Date.UTC(2026, 4, 11));
+  const bypassEnd   = new Date(Date.UTC(2026, 9, 21));
+  const weekStart   = mondayDate;
+  const weekEnd     = saturdayDate;
+
+  // Vérifier si la semaine sélectionnée est dans la fenêtre by-pass
+  const inBypass = weekEnd >= bypassStart && weekStart <= bypassEnd;
+
+  if (!inBypass) {
+    statusEl.style.display = 'none';
+  } else {
+    statusEl.style.display = 'inline-block';
+    statusEl.style.background = 'rgba(220,38,38,.3)';
+    statusEl.style.color = '#fca5a5';
+    statusEl.textContent = '⚡ BY-PASS ACTIF CETTE SEMAINE';
+  }
+
+  // Pour chaque jalon, calculer le statut par rapport à la semaine
+  JALONS_PLANNING.forEach(jalon => {
+    const dateEl  = document.getElementById('bypass-' + jalon.id + '-date');
+    const labelEl = document.getElementById('bypass-' + jalon.id + '-label');
+    if (!dateEl || !labelEl) return;
+
+    const jDate = new Date(Date.UTC(jalon.date.getFullYear(), jalon.date.getMonth(), jalon.date.getDate()));
+    const fmtD  = fmtDateFR(jDate);
+    dateEl.textContent = fmtD;
+
+    // Status relatif à la semaine
+    if (jDate >= weekStart && jDate <= weekEnd) {
+      // Jalon tombe CETTE semaine
+      dateEl.style.color = '#fbbf24';
+      const jDay = JOURS_FR[jDate.getUTCDay()];
+      labelEl.textContent = '← CETTE SEMAINE (' + jDay + ') ' + jalon.label;
+      labelEl.style.color = '#fbbf24';
+    } else if (jDate < weekStart) {
+      // Jalon passé
+      dateEl.style.color = '#6b7280';
+      labelEl.textContent = jalon.label + ' ✓';
+      labelEl.style.color = '#6b7280';
+    } else {
+      // Jalon futur
+      const diffDays = Math.round((jDate - weekStart) / 86400000);
+      const diffWeeks = Math.ceil(diffDays / 7);
+      dateEl.style.color = '#fca5a5';
+      labelEl.textContent = jalon.label + ' (dans ' + diffWeeks + ' sem.)';
+      labelEl.style.color = '#fca5a5';
+    }
+  });
+}
+
+// Initialisation au chargement — restaurer la semaine sauvegardée ou la semaine courante
+function initPlanningWeekSelector() {
+  const saved = localStorage.getItem('planningWeekNum');
+  const weekNow = getWeekNumber(new Date());
+  const weekToLoad = saved ? parseInt(saved, 10) : weekNow;
+
+  const input = document.getElementById('plan-semaine-input');
+  if (input) input.value = weekToLoad;
+  updatePlanningWeek(weekToLoad);
+  renderSyntheseTable();
+  updateSyntheseCounters();
+}
+
 //  PLANNING SEMAINE — Cellules éditables + persistance localStorage
 // ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+//  JALONS & RÉUNIONS — Données par semaine + jalons projet auto
+// ═══════════════════════════════════════════════════════════════════
+
+const JALONS_STORAGE_KEY = 'jalonsData_v2';
+
+const JALON_TYPES = {
+  'RÉUNION': { bg:'rgba(46,117,182,.25)',  color:'#93c5fd' },
+  'VISITE':  { bg:'rgba(124,58,237,.25)', color:'#c4b5fd' },
+  'SÉCU':    { bg:'rgba(245,158,11,.25)', color:'#fcd34d' },
+  'SWDE':    { bg:'rgba(46,117,182,.25)',  color:'#93c5fd' },
+  'RAPPORT': { bg:'rgba(46,117,182,.25)',  color:'#93c5fd' },
+  '⚡ JALON':{ bg:'rgba(220,38,38,.3)',    color:'#fca5a5' },
+  'ADMIN':   { bg:'rgba(22,163,74,.25)',   color:'#86efac' },
+  'LIVR.':   { bg:'rgba(245,158,11,.25)', color:'#fcd34d' },
+};
+
+const STATUT_TYPES = {
+  'PLANIFIÉ': { bg:'rgba(22,163,74,.2)',   color:'#86efac' },
+  'CRITIQUE': { bg:'rgba(220,38,38,.25)',  color:'#fca5a5' },
+  'FAIT':     { bg:'rgba(22,163,74,.4)',   color:'#4ade80' },
+  'ANNULÉ':   { bg:'rgba(107,114,128,.3)', color:'#9ca3af' },
+  'REPORTÉ':  { bg:'rgba(245,158,11,.25)', color:'#fcd34d' },
+};
+
+const JALONS_PROJET = [
+  { date: new Date(2026, 5,  1), heure:'07h00', type:'⚡ JALON', description:"Tâche 45 — Ouverture top CE + escalier colimaçon (DÉMARRAGE)", lieu:'CE Rhisnes – Suarlée', statut:'CRITIQUE', isProjet:true },
+  { date: new Date(2026, 5,  8), heure:'07h00', type:'⚡ JALON', description:"Tâche 21 — Montage échafaudage + lift (DÉMARRAGE)", lieu:'CE Rhisnes – Suarlée', statut:'CRITIQUE', isProjet:true },
+  { date: new Date(2026, 7,  3), heure:'À déf.', type:'SWDE',    description:"Vidange réseau SWDE — Coordination exploitation by-pass", lieu:'CE Rhisnes', statut:'PLANIFIÉ', isProjet:true },
+  { date: new Date(2026, 9, 21), heure:'À déf.', type:'⚡ JALON', description:"FIN fenêtre by-pass CE Rhisnes — Remise en service réseau SWDE", lieu:'CE Rhisnes', statut:'PLANIFIÉ', isProjet:true },
+];
+
+const JALONS_DEFAULT_S22 = [
+  { jour:1, heure:'08h00', type:'RÉUNION',  description:"Réunion lancement pré-mobilisation — Conducteur + Chefs d'équipe + Coord. Sécu", lieu:'Bureau chantier', statut:'PLANIFIÉ' },
+  { jour:2, heure:'08h30', type:'VISITE',   description:"Visite complète CE Rhisnes — Relevé accès top CE, état escalier colimaçon, zone échafaudage", lieu:'CE Rhisnes – Suarlée', statut:'PLANIFIÉ' },
+  { jour:3, heure:'14h00', type:'SÉCU',     description:"Coordination sécurité — Mise à jour PSS pour tâches 45 et 21 (travaux en hauteur, levage)", lieu:'Bureau chantier', statut:'PLANIFIÉ' },
+  { jour:4, heure:'09h00', type:'SWDE',     description:"Contact SWDE Exploitation — Suivi by-pass actif + confirmation planning vidange 03/08/26", lieu:'Téléphone / Teams', statut:'PLANIFIÉ' },
+  { jour:5, heure:'14h00', type:'⚡ JALON', description:"Validation plans T45 (ouverture top CE) + plan échafaudage T21 → GO pour 01/06", lieu:'Bureau chantier / BE', statut:'CRITIQUE' },
+  { jour:5, heure:'16h00', type:'RAPPORT',  description:"Rapport hebdomadaire — Synthèse préparatifs, points ouverts, planning semaine 01/06", lieu:'Bureau chantier', statut:'PLANIFIÉ' },
+];
+
+function getJalonsKey(weekNum) {
+  return JALONS_STORAGE_KEY + '_S' + weekNum + '_' + new Date().getFullYear();
+}
+
+function loadJalonsForWeek(weekNum) {
+  const key = getJalonsKey(weekNum);
+  const saved = localStorage.getItem(key);
+  if (saved) return JSON.parse(saved);
+  if (weekNum === 22) return JSON.parse(JSON.stringify(JALONS_DEFAULT_S22));
+  return [];
+}
+
+function saveJalonsForWeek(weekNum, rows) {
+  localStorage.setItem(getJalonsKey(weekNum), JSON.stringify(rows));
+}
+
+function getJalonsProjetsForWeek(weekNum) {
+  const year = new Date().getFullYear();
+  const monday = getMondayOfISOWeek(weekNum, year);
+  const sunday = new Date(monday); sunday.setUTCDate(monday.getUTCDate() + 6);
+  return JALONS_PROJET.filter(j => {
+    const jd = new Date(Date.UTC(j.date.getFullYear(), j.date.getMonth(), j.date.getDate()));
+    return jd >= monday && jd <= sunday;
+  }).map(j => {
+    const jd = new Date(Date.UTC(j.date.getFullYear(), j.date.getMonth(), j.date.getDate()));
+    const offset = Math.round((jd - monday) / 86400000);
+    return { jour: offset, heure: j.heure, type: j.type, description: j.description, lieu: j.lieu, statut: j.statut, isProjet: true };
+  });
+}
+
+function buildDayLabel(jourOffset, weekNum) {
+  const year = new Date().getFullYear();
+  const monday = getMondayOfISOWeek(weekNum, year);
+  const day = new Date(monday); day.setUTCDate(monday.getUTCDate() + jourOffset);
+  const NOMS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+  return NOMS[Math.min(jourOffset, 6)] + ' ' + day.getUTCDate() + ' ' + MOIS_FR[day.getUTCMonth()];
+}
+
+function buildDayOptions(weekNum, selected) {
+  return [0,1,2,3,4,5].map(i =>
+    '<option value="' + i + '"' + (i === selected ? ' selected' : '') + '>' + buildDayLabel(i, weekNum) + '</option>'
+  ).join('');
+}
+
+let _currentJalonsWeek = null;
+let _jalonsRows = [];
+
+function renderJalons(weekNum) {
+  _currentJalonsWeek = weekNum;
+  const tbody = document.getElementById('jalons-tbody');
+  if (!tbody) return;
+
+  let rows = loadJalonsForWeek(weekNum);
+  const projJalons = getJalonsProjetsForWeek(weekNum);
+  projJalons.forEach(pj => {
+    const already = rows.some(r => r.description === pj.description);
+    if (!already) rows.unshift(pj);
+  });
+
+  rows.sort((a, b) => {
+    if (a.jour !== b.jour) return a.jour - b.jour;
+    return (a.heure || '').localeCompare(b.heure || '');
+  });
+
+  _jalonsRows = rows;
+  tbody.innerHTML = '';
+
+  if (rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);font-size:12px;padding:20px;font-style:italic">Aucun événement — cliquez sur "+ Ajouter ligne"</td></tr>';
+    document.getElementById('jalons-count').textContent = '0 événements';
+    document.getElementById('jalons-title').textContent = 'Jalons & Réunions — Semaine ' + weekNum;
+    return;
+  }
+
+  rows.forEach((row, idx) => {
+    const isCritical = row.statut === 'CRITIQUE';
+    const isProjet   = !!row.isProjet;
+    const tr = document.createElement('tr');
+    if (isCritical) tr.className = 'critical';
+
+    const dayOptsHtml = buildDayOptions(weekNum, typeof row.jour === 'number' ? row.jour : 0);
+    const typeOptsHtml = Object.keys(JALON_TYPES).map(t =>
+      '<option value="' + t + '"' + (t === row.type ? ' selected' : '') + '>' + t + '</option>'
+    ).join('');
+    const statutOptsHtml = Object.keys(STATUT_TYPES).map(s =>
+      '<option value="' + s + '"' + (s === row.statut ? ' selected' : '') + '>' + s + '</option>'
+    ).join('');
+
+    // Construire la ligne avec data-attributes pour éviter les problèmes de quotes
+    tr.dataset.idx = idx;
+    tr.dataset.isprojet = isProjet ? '1' : '0';
+
+    const ss = 'background:var(--navy);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:10px;padding:2px 3px;width:100%;cursor:pointer';
+
+    // Cellule Jour
+    const tdJour = document.createElement('td');
+    tdJour.style.cssText = 'padding:4px 6px';
+    const selJour = document.createElement('select');
+    selJour.setAttribute('style', ss + ';font-size:11px;font-weight:600');
+    selJour.innerHTML = dayOptsHtml;
+    selJour.addEventListener('change', (function(i){ return function(){ jalonsUpdateRow(i,'jour',parseInt(this.value)); }; })(idx));
+    tdJour.appendChild(selJour);
+    if (isProjet) {
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:9px;color:var(--amber);margin-top:2px;font-family:var(--mono)';
+      lbl.textContent = '📋 PROJET';
+      tdJour.appendChild(lbl);
+    }
+
+    // Cellule Heure
+    const tdHeure = document.createElement('td');
+    tdHeure.style.cssText = 'padding:4px 6px';
+    const inpHeure = document.createElement('input');
+    inpHeure.type = 'text';
+    inpHeure.value = row.heure || '';
+    inpHeure.setAttribute('style','background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;width:52px;text-align:center');
+    inpHeure.addEventListener('input', (function(i){ return function(){ jalonsUpdateRow(i,'heure',this.value); }; })(idx));
+    tdHeure.appendChild(inpHeure);
+
+    // Cellule Type
+    const tdType = document.createElement('td');
+    tdType.style.cssText = 'padding:4px 6px';
+    const selType = document.createElement('select');
+    selType.setAttribute('style', ss);
+    selType.innerHTML = typeOptsHtml;
+    selType.addEventListener('change', (function(i){ return function(){ jalonsUpdateRow(i,'type',this.value); }; })(idx));
+    tdType.appendChild(selType);
+
+    // Cellule Description
+    const tdDesc = document.createElement('td');
+    tdDesc.style.cssText = 'padding:4px 6px;cursor:text';
+    tdDesc.contentEditable = 'true';
+    tdDesc.textContent = row.description || '';
+    tdDesc.addEventListener('input', (function(i){ return function(){ jalonsUpdateRow(i,'description',this.innerText); }; })(idx));
+
+    // Cellule Lieu
+    const tdLieu = document.createElement('td');
+    tdLieu.style.cssText = 'padding:4px 6px;font-size:11px;cursor:text;color:var(--muted)';
+    tdLieu.contentEditable = 'true';
+    tdLieu.textContent = row.lieu || '';
+    tdLieu.addEventListener('input', (function(i){ return function(){ jalonsUpdateRow(i,'lieu',this.innerText); }; })(idx));
+
+    // Cellule Statut
+    const tdStatut = document.createElement('td');
+    tdStatut.style.cssText = 'padding:4px 6px';
+    const selStatut = document.createElement('select');
+    selStatut.setAttribute('style', ss);
+    selStatut.innerHTML = statutOptsHtml;
+    selStatut.addEventListener('change', (function(i){ return function(){ jalonsUpdateRow(i,'statut',this.value); }; })(idx));
+    tdStatut.appendChild(selStatut);
+
+    // Cellule Supprimer
+    const tdDel = document.createElement('td');
+    tdDel.style.cssText = 'padding:4px 2px;text-align:center';
+    if (!isProjet) {
+      const btn = document.createElement('button');
+      btn.title = 'Supprimer';
+      btn.textContent = '✕';
+      btn.setAttribute('style','background:none;border:none;color:#6b7280;cursor:pointer;font-size:13px;padding:0');
+      btn.addEventListener('click', (function(i){ return function(){ jalonsDeleteRow(i); }; })(idx));
+      tdDel.appendChild(btn);
+    }
+
+    tr.appendChild(tdJour);
+    tr.appendChild(tdHeure);
+    tr.appendChild(tdType);
+    tr.appendChild(tdDesc);
+    tr.appendChild(tdLieu);
+    tr.appendChild(tdStatut);
+    tr.appendChild(tdDel);
+    tbody.appendChild(tr);
+  });
+
+  const n = rows.length;
+  document.getElementById('jalons-count').textContent = n + ' événement' + (n > 1 ? 's' : '');
+  document.getElementById('jalons-title').textContent = 'Jalons & Réunions — Semaine ' + weekNum;
+}
+
+function jalonsUpdateRow(idx, field, value) {
+  if (!_jalonsRows[idx]) return;
+  _jalonsRows[idx][field] = value;
+  saveJalonsForWeek(_currentJalonsWeek, _jalonsRows);
+}
+
+function jalonsAddRow() {
+  _jalonsRows.push({ jour: 0, heure: '08h00', type: 'RÉUNION', description: '', lieu: '', statut: 'PLANIFIÉ' });
+  saveJalonsForWeek(_currentJalonsWeek, _jalonsRows);
+  renderJalons(_currentJalonsWeek);
+}
+
+function jalonsDeleteRow(idx) {
+  if (!confirm('Supprimer cet événement ?')) return;
+  _jalonsRows.splice(idx, 1);
+  saveJalonsForWeek(_currentJalonsWeek, _jalonsRows);
+  renderJalons(_currentJalonsWeek);
+}
+
+function jalonsReset() {
+  if (!confirm('Réinitialiser tous les jalons de la semaine ' + _currentJalonsWeek + ' ?')) return;
+  localStorage.removeItem(getJalonsKey(_currentJalonsWeek));
+  renderJalons(_currentJalonsWeek);
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  MOTEUR DONNÉES CENTRAL — Synthèse dynamique + liaison planning
+// ═══════════════════════════════════════════════════════════════════
+
+// ── Référentiel des tâches (source unique de vérité) ──────────────
+// Format : { id, cat, nom, debut:'DD/MM/YY', fin:'DD/MM/YY', duree, domaine, isSummary }
+// domaine : 'COORD' | 'PREP' | 'SECU' | 'BYPASS' | 'EXT' | 'INT' | 'DIVERS' | 'RECAP'
+const TACHES = [
+  // INSPECTION
+  { id:5,  cat:'INSPECTION', nom:"Inspection CE Rhisnes (global)",                              debut:'28/01/26', fin:'26/04/27', duree:'283 j', domaine:'RECAP',  isSummary:true },
+  { id:6,  cat:'INSPECTION', nom:"Réalisation de l'inspection in situ",                         debut:'02/03/26', fin:'18/03/26', duree:'13 j',  domaine:'COORD' },
+  { id:7,  cat:'INSPECTION', nom:"Rapport + MAJ NC du CE Rhisnes",                              debut:'19/03/26', fin:'01/04/26', duree:'10 j',  domaine:'COORD' },
+  { id:8,  cat:'INSPECTION', nom:"Décision SWDE travaux de renforcement",                       debut:'02/04/26', fin:'09/04/26', duree:'5 j',   domaine:'COORD' },
+  { id:9,  cat:'INSPECTION', nom:"Éventuels travaux de renforcement",                           debut:'10/04/26', fin:'04/05/26', duree:'12 j',  domaine:'PREP'  },
+  // DIVERS
+  { id:14, cat:'DIVERS',     nom:"Réparations ponctuelles béton (plafond cave)",                debut:'28/01/26', fin:'03/02/26', duree:'5 j',   domaine:'PREP'  },
+  { id:15, cat:'DIVERS',     nom:"Protections des bétons de la cave",                           debut:'04/08/26', fin:'17/08/26', duree:'10 j',  domaine:'PREP'  },
+  { id:16, cat:'DIVERS',     nom:"Revêtement sol RDC + trappe + sterfput (Phase I)",            debut:'11/12/26', fin:'17/12/26', duree:'5 j',   domaine:'PREP'  },
+  // BY-PASS
+  { id:40, cat:'BYPASS',     nom:"Fenêtre by-pass CE Rhisnes",                                  debut:'11/05/26', fin:'21/10/26', duree:'100 j', domaine:'BYPASS', isBypass:true },
+  // EXTÉRIEUR
+  { id:21, cat:'EXT',        nom:"Montage échafaudage + lift",                                  debut:'08/06/26', fin:'10/07/26', duree:'25 j',  domaine:'PREP'  },
+  { id:22, cat:'EXT',        nom:"Démontage bardage + isolation sphère + garde-corps",          debut:'03/08/26', fin:'14/08/26', duree:'10 j',  domaine:'PREP'  },
+  { id:23, cat:'EXT',        nom:"Inspection extérieure + planification réparations",           debut:'10/08/26', fin:'14/08/26', duree:'5 j',   domaine:'COORD' },
+  { id:24, cat:'EXT',        nom:"Remplacement éventuel pattes fixation bardage",               debut:'17/08/26', fin:'01/09/26', duree:'12 j',  domaine:'PREP'  },
+  { id:25, cat:'EXT',        nom:"Thermo-bâchage de la sphère",                                debut:'26/08/26', fin:'08/09/26', duree:'10 j',  domaine:'PREP'  },
+  { id:26, cat:'EXT',        nom:"Pose capteurs/câblage monitoring (Phase I)",                  debut:'26/08/26', fin:'08/09/26', duree:'10 j',  domaine:'PREP'  },
+  { id:27, cat:'EXT',        nom:"Pose protection contre corrosion — sphère",                   debut:'09/09/26', fin:'06/10/26', duree:'20 j',  domaine:'PREP'  },
+  { id:28, cat:'EXT',        nom:"Pose capteurs/câblage monitoring (Phase II)",                 debut:'30/09/26', fin:'13/10/26', duree:'10 j',  domaine:'PREP'  },
+  { id:29, cat:'EXT',        nom:"Pose isolation autour de la sphère",                          debut:'07/10/26', fin:'15/10/26', duree:'7 j',   domaine:'PREP'  },
+  { id:30, cat:'EXT',        nom:"Pose bardage autour de la sphère",                            debut:'16/10/26', fin:'18/01/27', duree:'50 j',  domaine:'PREP'  },
+  { id:31, cat:'EXT',        nom:"Démontage thermo-bâchage sphère + bâchage tronc ext.",       debut:'12/01/27', fin:'01/02/27', duree:'15 j',  domaine:'PREP'  },
+  { id:32, cat:'EXT',        nom:"Pose protection extérieure contre corrosion",                 debut:'02/02/27', fin:'19/03/27', duree:'34 j',  domaine:'PREP'  },
+  { id:33, cat:'EXT',        nom:"Inspection générale avant démontage échafaudage",             debut:'22/03/27', fin:'26/03/27', duree:'5 j',   domaine:'COORD' },
+  { id:34, cat:'EXT',        nom:"Démontage échafaudage",                                       debut:'29/03/27', fin:'16/04/27', duree:'15 j',  domaine:'PREP'  },
+  { id:35, cat:'EXT',        nom:"Vérification réseau dégouttage",                              debut:'19/04/27', fin:'22/04/27', duree:'4 j',   domaine:'PREP'  },
+  { id:36, cat:'EXT',        nom:"Démontage empierrement + trottoir béton périphérique",        debut:'19/04/27', fin:'26/04/27', duree:'6 j',   domaine:'PREP'  },
+  { id:37, cat:'EXT',        nom:"Remise en état général du site",                              debut:'19/04/27', fin:'26/04/27', duree:'6 j',   domaine:'PREP'  },
+  // INTÉRIEUR
+  { id:43, cat:'INT',        nom:"Inspection + planification réparations structurelles",        debut:'05/03/26', fin:'25/03/26', duree:'15 j',  domaine:'COORD' },
+  { id:44, cat:'INT',        nom:"Réfection conduites condensat + structures portantes + trappes",debut:'28/01/26',fin:'17/02/26',duree:'15 j', domaine:'PREP'  },
+  { id:45, cat:'INT',        nom:"Ouverture top CE + Démontage escalier colimaçon + Réfection trappe",debut:'01/06/26',fin:'19/06/26',duree:'15 j',domaine:'PREP', isKey:true },
+  { id:46, cat:'INT',        nom:"By-pass + vidange CE",                                        debut:'03/08/26', fin:'04/08/26', duree:'1 j',   domaine:'BYPASS'},
+  { id:47, cat:'INT',        nom:"Démontage tuyauteries + alimentations électriques",           debut:'04/08/26', fin:'17/08/26', duree:'10 j',  domaine:'PREP'  },
+  { id:48, cat:'INT',        nom:"Pose fixations nouvelles canalisations + câblage éclairage",  debut:'18/08/26', fin:'24/08/26', duree:'5 j',   domaine:'PREP'  },
+  { id:49, cat:'INT',        nom:"Nettoyage fond réservoir (Travaux supplémentaires)",          debut:'04/08/26', fin:'07/08/26', duree:'3 j',   domaine:'PREP'  },
+  { id:50, cat:'INT',        nom:"Pose échafaudage dans le réservoir",                          debut:'07/08/26', fin:'21/08/26', duree:'10 j',  domaine:'PREP'  },
+  { id:51, cat:'INT',        nom:"Inspection + réparations éventuelles (liée extérieur)",       debut:'21/08/26', fin:'01/09/26', duree:'8 j',   domaine:'PREP'  },
+  { id:52, cat:'INT',        nom:"Pose fixations échelles accès top CE + cuve",                 debut:'21/08/26', fin:'25/08/26', duree:'3 j',   domaine:'PREP'  },
+  { id:53, cat:'INT',        nom:"Pose revêtement epoxy dans le réservoir",                     debut:'26/08/26', fin:'11/09/26', duree:'13 j',  domaine:'PREP'  },
+  { id:54, cat:'INT',        nom:"Inspection générale du réservoir",                            debut:'14/09/26', fin:'14/09/26', duree:'1 j',   domaine:'COORD' },
+  { id:55, cat:'INT',        nom:"Démontage échafaudage dans le réservoir",                     debut:'15/09/26', fin:'22/09/26', duree:'6 j',   domaine:'PREP'  },
+  { id:56, cat:'INT',        nom:"Pose échelles cuve + top CE",                                 debut:'18/09/26', fin:'24/09/26', duree:'5 j',   domaine:'PREP'  },
+  { id:57, cat:'INT',        nom:"Protection intérieure corrosion — fût + escalier colimaçon", debut:'25/09/26', fin:'01/10/26', duree:'5 j',   domaine:'PREP'  },
+  { id:58, cat:'INT',        nom:"Protection intérieure corrosion — fût + escaliers + tuyau de décharge",debut:'02/10/26',fin:'19/11/26',duree:'28 j',domaine:'PREP'},
+  { id:59, cat:'INT',        nom:"Pose nouvelles tuyauteries",                                  debut:'20/11/26', fin:'08/12/26', duree:'13 j',  domaine:'PREP'  },
+  { id:60, cat:'INT',        nom:"Nettoyage & Désinfection cuve (via nouvelle échelle crinoline)",debut:'25/11/26',fin:'30/11/26',duree:'4 j',  domaine:'PREP'  },
+  { id:61, cat:'INT',        nom:"Raccordement sur existant",                                   debut:'09/12/26', fin:'11/12/26', duree:'3 j',   domaine:'PREP'  },
+  { id:62, cat:'INT',        nom:"Pose nouvelle porte + nouveaux hublots",                      debut:'27/11/26', fin:'10/12/26', duree:'10 j',  domaine:'PREP'  },
+  { id:63, cat:'INT',        nom:"Travaux équipements généraux partie EM",                      debut:'14/12/26', fin:'05/03/27', duree:'50 j',  domaine:'PREP'  },
+  { id:64, cat:'INT',        nom:"Connexion système de monitoring",                             debut:'08/03/27', fin:'14/04/27', duree:'28 j',  domaine:'COORD' },
+];
+
+const TACHES_TERMINEE_KEY = 'tachesTerminees_v1';
+
+function parseDateFR(s) {
+  // 'DD/MM/YY' → Date UTC
+  const [d,m,y] = s.split('/').map(Number);
+  return new Date(Date.UTC(2000 + y, m - 1, d));
+}
+
+function getTachesTerminees() {
+  return JSON.parse(localStorage.getItem(TACHES_TERMINEE_KEY) || '[]');
+}
+function toggleTacheTerminee(id) {
+  let done = getTachesTerminees();
+  if (done.includes(id)) done = done.filter(x => x !== id);
+  else done.push(id);
+  localStorage.setItem(TACHES_TERMINEE_KEY, JSON.stringify(done));
+  renderSyntheseTable();
+  updateSyntheseCounters();
+}
+
+function getTacheStatut(t) {
+  const today = new Date(); today.setUTCHours(0,0,0,0);
+  const done  = getTachesTerminees();
+  if (t.isSummary) return { cls:'status-ok', label:'Récapitulatif', row:'' };
+  if (done.includes(t.id)) return { cls:'status-done', label:'✔ TERMINÉ', row:'done' };
+  const debut = parseDateFR(t.debut);
+  const fin   = parseDateFR(t.fin);
+  if (fin < today)    return { cls:'status-done', label:'✔ TERMINÉ (auto)', row:'done' };
+  if (debut <= today && fin >= today) {
+    return { cls:'status-alert', label:'⚡ EN COURS', row:'alert' };
+  }
+  const diffJ = Math.round((debut - today) / 86400000);
+  if (diffJ <= 7)  return { cls:'status-alert', label:'⚡ Dans ' + diffJ + 'j !', row:'alert' };
+  if (diffJ <= 14) return { cls:'status-alert', label:'⚡ Dans ' + diffJ + 'j', row:'alert' };
+  return { cls:'status-ok', label:'À venir', row:'' };
+}
+
+function updateSyntheseCounters() {
+  const today   = new Date(); today.setUTCHours(0,0,0,0);
+  const done    = getTachesTerminees();
+  const working = TACHES.filter(t => !t.isSummary);
+  let nDone = 0, nCours = 0, nImm = 0;
+  working.forEach(t => {
+    const debut = parseDateFR(t.debut);
+    const fin   = parseDateFR(t.fin);
+    const isDone = done.includes(t.id) || fin < today;
+    if (isDone) { nDone++; return; }
+    if (debut <= today) { nCours++; return; }
+    const diff = Math.round((debut - today) / 86400000);
+    if (diff <= 14) nImm++;
+  });
+  const total = working.length;
+  const counterEl = document.querySelector('#tab-synthese .plan-header div:last-child');
+  if (counterEl) {
+    counterEl.innerHTML =
+      '<div style="font-size:20px;font-family:var(--mono);color:var(--amber);font-weight:700">' + total + ' tâches</div>' +
+      '<div style="font-size:11px;color:var(--green);margin-top:4px">' +
+        '✔ ' + nDone + ' terminées' +
+        (nCours > 0 ? ' &nbsp;|&nbsp; <span style="color:var(--blue2)">🔨 ' + nCours + ' en cours</span>' : '') +
+        (nImm  > 0 ? ' &nbsp;|&nbsp; <span style="color:var(--red)">⚡ ' + nImm  + ' imminentes</span>' : '') +
+      '</div>';
+  }
+}
+
+// ── Catégories pour la table de synthèse ──────────────────────────
+const CAT_LABELS = {
+  'INSPECTION': '── INSPECTION CE RHISNES ──',
+  'DIVERS':     '── DIVERS ──',
+  'BYPASS':     '── CONTRAINTE BY-PASS (ACTIF) ──',
+  'EXT':        '── PARTIE EXTÉRIEURE ──',
+  'INT':        '── PARTIE INTÉRIEURE ──',
+};
+
+function renderSyntheseTable() {
+  const tbody = document.querySelector('#tab-synthese .synth-table tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  let lastCat = null;
+  TACHES.forEach(t => {
+    if (t.cat !== lastCat) {
+      lastCat = t.cat;
+      const secRow = document.createElement('tr');
+      secRow.className = 'sec-row';
+      secRow.innerHTML = '<td colspan="7">' + (CAT_LABELS[t.cat] || ('── ' + t.cat + ' ──')) + '</td>';
+      tbody.appendChild(secRow);
+    }
+    const st = getTacheStatut(t);
+    const tr = document.createElement('tr');
+    if (st.row) tr.className = st.row;
+
+    // Checkbox TERMINÉ (sauf récap et bypass)
+    const canToggle = !t.isSummary && !t.isBypass;
+    const isDone    = st.cls === 'status-done';
+
+    tr.innerHTML =
+      '<td style="font-family:var(--mono);font-size:10px">' + t.id + '</td>' +
+      '<td>' + (t.isKey ? '<strong>' + t.nom + '</strong>' : t.nom) + '</td>' +
+      '<td style="font-family:var(--mono);font-size:10px">' + t.debut + '</td>' +
+      '<td style="font-family:var(--mono);font-size:10px">' + t.fin + '</td>' +
+      '<td style="font-family:var(--mono);font-size:10px">' + t.duree + '</td>' +
+      '<td class="' + st.cls + '">' + st.label + '</td>' +
+      '<td style="text-align:center;padding:4px">' +
+        (canToggle
+          ? '<button onclick="toggleTacheTerminee(' + t.id + ')" title="' + (isDone ? 'Marquer non terminé' : 'Marquer terminé') + '" ' +
+            'style="background:' + (isDone ? 'rgba(22,163,74,.3)' : 'rgba(100,100,100,.15)') + ';border:1px solid ' +
+            (isDone ? 'rgba(22,163,74,.5)' : 'var(--border)') + ';border-radius:4px;color:' +
+            (isDone ? 'var(--green)' : 'var(--muted)') + ';cursor:pointer;font-size:11px;padding:2px 7px">'+
+            (isDone ? '✔' : '○') + '</button>'
+          : '') +
+      '</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+// ── LIAISON : Tâches actives de la semaine → planning + jalons ───
+function getTachesActivesPourSemaine(weekNum) {
+  const year   = new Date().getFullYear();
+  const monday = getMondayOfISOWeek(weekNum, year);
+  const sunday = new Date(monday); sunday.setUTCDate(monday.getUTCDate() + 6);
+  const done   = getTachesTerminees();
+
+  const res = { demarrent: [], enCours: [], terminent: [], actives: [] };
+
+  TACHES.forEach(t => {
+    if (t.isSummary) return;
+    const isDone = done.includes(t.id) || parseDateFR(t.fin) < monday;
+    if (isDone) return;
+
+    const debut = parseDateFR(t.debut);
+    const fin   = parseDateFR(t.fin);
+
+    const debutCetteSem = debut >= monday && debut <= sunday;
+    const finCetteSem   = fin   >= monday && fin   <= sunday;
+    const enCoursSem    = debut <= monday && fin   >= sunday;
+
+    if (debutCetteSem) res.demarrent.push(t);
+    else if (finCetteSem) res.terminent.push(t);
+    else if (enCoursSem) res.enCours.push(t);
+
+    if (debutCetteSem || finCetteSem || enCoursSem) res.actives.push(t);
+  });
+  return res;
+}
+
+// Injecter tâches actives dans une section dédiée du planning
+function renderTachesActivesPlanning(weekNum) {
+  const container = document.getElementById('plan-taches-actives');
+  if (!container) return;
+
+  const { demarrent, enCours, terminent } = getTachesActivesPourSemaine(weekNum);
+
+  if (!demarrent.length && !enCours.length && !terminent.length) {
+    container.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:12px;font-style:italic">Aucune tâche active du planning global cette semaine</div>';
+    return;
+  }
+
+  const year   = new Date().getFullYear();
+  const monday = getMondayOfISOWeek(weekNum, year);
+  const NOMS_COURT = ['Lun','Mar','Mer','Jeu','Ven','Sam'];
+
+  let html = '';
+
+  const renderGroupe = (taches, label, couleur, icon) => {
+    if (!taches.length) return;
+    html += '<div style="margin-bottom:10px">';
+    html += '<div style="font-size:10px;font-weight:700;color:' + couleur + ';font-family:var(--mono);margin-bottom:5px;letter-spacing:.5px">' + icon + ' ' + label + '</div>';
+    taches.forEach(t => {
+      const debut = parseDateFR(t.debut);
+      const fin   = parseDateFR(t.fin);
+      // Quel jour de la semaine démarre/finit ?
+      const offsetDebut = Math.max(0, Math.min(5, Math.round((debut - monday)/86400000)));
+      const offsetFin   = Math.max(0, Math.min(5, Math.round((fin   - monday)/86400000)));
+      const jourLabel   = (label.includes('Démarr')) ? NOMS_COURT[offsetDebut] : (label.includes('Termin')) ? NOMS_COURT[offsetFin] : 'Sem.';
+      html +=
+        '<div style="display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);' +
+        'border-left:3px solid ' + couleur + ';border-radius:6px;padding:6px 10px;margin-bottom:4px">' +
+        '<span style="font-family:var(--mono);font-size:10px;color:var(--muted);min-width:28px">' + t.id + '</span>' +
+        '<span style="font-size:11px;flex:1">' + t.nom + '</span>' +
+        '<span style="font-family:var(--mono);font-size:10px;color:' + couleur + ';white-space:nowrap">' + jourLabel + ' ' +
+          (label.includes('Démarr') ? t.debut : t.fin) +
+        '</span>' +
+        '</div>';
+    });
+    html += '</div>';
+  };
+
+  renderGroupe(demarrent, 'Démarrent cette semaine', '#fbbf24', '🚀');
+  renderGroupe(enCours,   'En cours toute la semaine', '#93c5fd', '🔨');
+  renderGroupe(terminent, 'Se terminent cette semaine', '#86efac', '✅');
+
+  container.innerHTML = html;
+
+  // Auto-injecter dans jalons si pas déjà présent
+  injecterJalonsDepuisSynthese(weekNum, demarrent, terminent);
+}
+
+function injecterJalonsDepuisSynthese(weekNum, demarrent, terminent) {
+  let rows = loadJalonsForWeek(weekNum);
+  let changed = false;
+
+  demarrent.forEach(t => {
+    const desc = 'T' + t.id + ' — ' + t.nom + ' (DÉMARRAGE ' + t.debut + ')';
+    if (!rows.some(r => r.description && r.description.includes('T' + t.id + ' —'))) {
+      const debut = parseDateFR(t.debut);
+      const year  = new Date().getFullYear();
+      const monday = getMondayOfISOWeek(weekNum, year);
+      const offset = Math.max(0, Math.min(5, Math.round((debut - monday)/86400000)));
+      rows.push({ jour: offset, heure:'07h00', type:'⚡ JALON', description: desc, lieu:'CE Rhisnes', statut:'PLANIFIÉ', isProjet:true });
+      changed = true;
+    }
+  });
+
+  terminent.forEach(t => {
+    const desc = 'T' + t.id + ' — ' + t.nom + ' (FIN ' + t.fin + ')';
+    if (!rows.some(r => r.description && r.description.includes('T' + t.id + ' —'))) {
+      const fin   = parseDateFR(t.fin);
+      const year  = new Date().getFullYear();
+      const monday = getMondayOfISOWeek(weekNum, year);
+      const offset = Math.max(0, Math.min(5, Math.round((fin - monday)/86400000)));
+      rows.push({ jour: offset, heure:'18h00', type:'✅ FIN', description: desc, lieu:'CE Rhisnes', statut:'PLANIFIÉ', isProjet:true });
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    saveJalonsForWeek(weekNum, rows);
+    renderJalons(weekNum);
+  }
+}
+
+// Ajouter '✅ FIN' aux types de jalons
+JALON_TYPES['✅ FIN'] = { bg:'rgba(22,163,74,.25)', color:'#86efac' };
+
 const PLAN_STORAGE_KEY = 'planningCells_v1';
 
 function savePlanCell(cellId, el) {
@@ -2952,6 +3618,7 @@ renderSuiviTable();
 loadTheme();
 loadUser();
 loadPlanCells();
+  initPlanningWeekSelector();
 renderHistory();
 initSignaturePad();
 attachDraftListeners();
