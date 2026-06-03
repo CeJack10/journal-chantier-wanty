@@ -1,4 +1,4 @@
-<!-- BUILD:1780514365 -->
+<!-- BUILD:1780516345 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -645,6 +645,79 @@
   .badge-secu  { background: rgba(245,158,11,.3); color: #fcd34d; }
   .badge-bypass{ background: rgba(124,58,237,.3); color: #c4b5fd; }
   .badge-alert { background: rgba(220,38,38,.3); color: #fca5a5; }
+
+  /* ── Modale fiche rapide jalon ─────────────────────────── */
+  .jalon-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.6); z-index: 1000;
+    align-items: center; justify-content: center;
+  }
+  .jalon-modal-overlay.open { display: flex; }
+  .jalon-modal {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 0; width: 460px; max-width: 95vw;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  .jalon-modal-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--card); z-index: 1;
+  }
+  .jalon-modal-header h3 { margin: 0; font-size: 14px; flex: 1; }
+  .jalon-modal-body { padding: 16px 20px; }
+  .jalon-modal-row { margin-bottom: 12px; }
+  .jalon-modal-row label {
+    display: block; font-size: 10px; font-weight: 700;
+    color: var(--muted); font-family: var(--mono);
+    text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px;
+  }
+  .jalon-modal-row input, .jalon-modal-row select, .jalon-modal-row textarea {
+    width: 100%; background: var(--navy); border: 1px solid var(--border);
+    border-radius: 7px; color: var(--text); font-size: 12px;
+    padding: 8px 10px; font-family: var(--sans); box-sizing: border-box;
+  }
+  .jalon-modal-row textarea { resize: vertical; min-height: 60px; }
+  .jalon-modal-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .jalon-modal-advanced { margin-top: 8px; }
+  .jalon-modal-advanced summary {
+    font-size: 11px; color: var(--muted); cursor: pointer;
+    padding: 6px 0; font-family: var(--mono); letter-spacing: .3px;
+  }
+  .jalon-modal-advanced summary:hover { color: var(--blue2); }
+  .jalon-modal-footer {
+    display: flex; gap: 8px; padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    position: sticky; bottom: 0; background: var(--card);
+  }
+  .jalon-modal-footer .btn-del {
+    background: rgba(220,38,38,.15); color: var(--red);
+    border: 1px solid rgba(220,38,38,.3);
+    border-radius: 7px; padding: 8px 14px; font-size: 11px;
+    font-weight: 700; cursor: pointer; font-family: var(--sans);
+  }
+  .jalon-modal-footer .btn-save {
+    flex: 1; background: var(--blue); color: #fff; border: none;
+    border-radius: 7px; padding: 9px 16px; font-size: 12px;
+    font-weight: 700; cursor: pointer; font-family: var(--sans);
+  }
+  .jalon-modal-footer .btn-save-place {
+    flex: 1.2; background: rgba(46,117,182,.25); color: var(--blue2);
+    border: 1px solid rgba(46,117,182,.4);
+    border-radius: 7px; padding: 9px 12px; font-size: 11px;
+    font-weight: 700; cursor: pointer; font-family: var(--sans);
+  }
+  /* Bouton + Jalon fixe */
+  .btn-jalon-fixe {
+    position: fixed; bottom: 24px; right: 24px; z-index: 900;
+    background: var(--blue); color: #fff; border: none;
+    border-radius: 50px; padding: 12px 22px;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    font-family: var(--sans); box-shadow: 0 4px 20px rgba(46,117,182,.5);
+    display: flex; align-items: center; gap: 6px;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn-jalon-fixe:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(46,117,182,.6); }
 
   .jalons-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
   .jalons-table th {
@@ -1345,7 +1418,7 @@
           <div class="plan-cell head-day" id="plan-hd-4" style="background:rgba(46,117,182,.3)"><div class="date" id="plan-hd-4-d">30</div><div id="plan-hd-4-wd">SAM</div><div id="plan-hd-4-m">Mai</div></div>
           <div class="plan-cell head-day" id="plan-hd-5" style="background:rgba(46,117,182,.2)"><div class="date" id="plan-hd-5-d">31</div><div id="plan-hd-5-wd">DIM</div><div id="plan-hd-5-m">Mai</div></div>
         <!-- SECTION COORDINATION -->
-        <div class="plan-cell sec-label">🤝 COORDINATION & RÉUNIONS</div>
+        <div class="plan-cell sec-label">🤝 COORDINATION & RÉUNIONS<button onclick="ouvrirFicheJalon(null,{lignePlanning:'COORD'})" style="margin-left:8px;background:rgba(46,117,182,.2);color:var(--blue2);border:1px solid rgba(46,117,182,.3);border-radius:4px;padding:2px 8px;font-size:9px;font-weight:700;cursor:pointer;font-family:var(--mono);white-space:nowrap">+ Jalon</button></div>
 
         <div class="plan-cell task coord-cell" contenteditable="true" data-cell-id="pc1"
       oninput="savePlanCell('pc1',this)"
@@ -1385,7 +1458,7 @@
         <div class="plan-cell empty">—</div>
 
         <!-- SECTION PRÉPA T45 -->
-        <div class="plan-cell sec-label">🔧 PRÉPARATION TÂCHE 45 — 01/06 : Ouverture top CE + Démontage escalier colimaçon (15j)</div>
+        <div class="plan-cell sec-label">🔧 PRÉPARATION TÂCHE 45 — 01/06 : Ouverture top CE + Démontage escalier colimaçon (15j)<button onclick="ouvrirFicheJalon(null,{lignePlanning:'PRÉPA T45'})" style="margin-left:8px;background:rgba(46,117,182,.2);color:var(--blue2);border:1px solid rgba(46,117,182,.3);border-radius:4px;padding:2px 8px;font-size:9px;font-weight:700;cursor:pointer;font-family:var(--mono);white-space:nowrap">+ Jalon</button></div>
 
         <div class="plan-cell task prep-cell" contenteditable="true" data-cell-id="pc6"
       oninput="savePlanCell('pc6',this)"
@@ -1425,7 +1498,7 @@
         <div class="plan-cell empty">—</div>
 
         <!-- SECTION PRÉPA T21 -->
-        <div class="plan-cell sec-label">🏗 PRÉPARATION TÂCHE 21 — 08/06 : Montage échafaudage + lift (25j)</div>
+        <div class="plan-cell sec-label">🏗 PRÉPARATION TÂCHE 21 — 08/06 : Montage échafaudage + lift (25j)<button onclick="ouvrirFicheJalon(null,{lignePlanning:'PRÉPA T21'})" style="margin-left:8px;background:rgba(46,117,182,.2);color:var(--blue2);border:1px solid rgba(46,117,182,.3);border-radius:4px;padding:2px 8px;font-size:9px;font-weight:700;cursor:pointer;font-family:var(--mono);white-space:nowrap">+ Jalon</button></div>
 
         <div class="plan-cell task prep-cell" contenteditable="true" data-cell-id="pc11"
       oninput="savePlanCell('pc11',this)"
@@ -1465,7 +1538,7 @@
         <div class="plan-cell empty">—</div>
 
         <!-- SECTION SÉCURITÉ -->
-        <div class="plan-cell sec-label">🦺 SÉCURITÉ — PSS / PERMIS / ANALYSE RISQUES</div>
+        <div class="plan-cell sec-label">🦺 SÉCURITÉ — PSS / PERMIS / ANALYSE RISQUES<button onclick="ouvrirFicheJalon(null,{lignePlanning:'SÉCU'})" style="margin-left:8px;background:rgba(46,117,182,.2);color:var(--blue2);border:1px solid rgba(46,117,182,.3);border-radius:4px;padding:2px 8px;font-size:9px;font-weight:700;cursor:pointer;font-family:var(--mono);white-space:nowrap">+ Jalon</button></div>
 
         <div class="plan-cell task secu-cell" contenteditable="true" data-cell-id="pc16"
       oninput="savePlanCell('pc16',this)"
@@ -1505,7 +1578,7 @@
         <div class="plan-cell empty">—</div>
 
         <!-- SECTION BY-PASS -->
-        <div class="plan-cell sec-label">💧 BY-PASS & EXPLOITATION SWDE — Fenêtre active : 11/05/26 → 21/10/26</div>
+        <div class="plan-cell sec-label">💧 BY-PASS & EXPLOITATION SWDE — Fenêtre active : 11/05/26 → 21/10/26<button onclick="ouvrirFicheJalon(null,{lignePlanning:'BY-PASS'})" style="margin-left:8px;background:rgba(46,117,182,.2);color:var(--blue2);border:1px solid rgba(46,117,182,.3);border-radius:4px;padding:2px 8px;font-size:9px;font-weight:700;cursor:pointer;font-family:var(--mono);white-space:nowrap">+ Jalon</button></div>
 
         <div class="plan-cell task bypass-cell" contenteditable="true" data-cell-id="pc21"
       oninput="savePlanCell('pc21',this)"
@@ -1567,20 +1640,47 @@
       <span class="toggle" style="margin-left:auto">▼</span>
     </div>
     <div class="section-body" style="padding:0">
-      <!-- Barre d'actions jalons -->
-      <div style="display:flex;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap;align-items:center">
-        <span style="font-size:10px;color:var(--muted);font-family:var(--mono);flex:1">
-          📅 Données propres à chaque semaine — sauvegarde automatique
-        </span>
+      <!-- Barre d'actions + filtres jalons -->
+      <div style="display:flex;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);
+                  background:var(--surface);flex-wrap:wrap;align-items:center">
+        <!-- Filtres responsable -->
+        <div style="display:flex;gap:4px;flex-wrap:wrap;flex:1">
+          <span style="font-size:10px;color:var(--muted);font-family:var(--mono);align-self:center;margin-right:4px">Filtre :</span>
+          <button id="jf-tous" onclick="jalonsSetFiltre('tous')"
+            style="background:var(--blue);color:#fff;border:none;border-radius:5px;
+                   padding:3px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--mono)">
+            Tous
+          </button>
+          <select id="jf-resp" onchange="jalonsSetFiltre('resp',this.value)"
+            style="background:var(--navy);border:1px solid var(--border);border-radius:5px;
+                   color:var(--text);font-size:10px;padding:3px 6px;cursor:pointer">
+            <option value="">— Responsable —</option>
+          </select>
+          <select id="jf-statut" onchange="jalonsSetFiltre('statut',this.value)"
+            style="background:var(--navy);border:1px solid var(--border);border-radius:5px;
+                   color:var(--text);font-size:10px;padding:3px 6px;cursor:pointer">
+            <option value="">— Statut —</option>
+            <option>À faire</option>
+            <option>En cours</option>
+            <option>Fait</option>
+            <option>Bloquant</option>
+            <option>Reporté</option>
+          </select>
+        </div>
+        <button onclick="ouvrirFicheJalon()"
+          style="background:var(--blue);color:#fff;border:none;
+                 border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)">
+          + Jalon
+        </button>
         <button onclick="jalonsAddRow()"
           style="background:rgba(22,163,74,.2);color:var(--green);border:1px solid rgba(22,163,74,.3);
-                 border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">
-          + Ajouter ligne
+                 border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">
+          + Ligne vide
         </button>
         <button onclick="jalonsReset()"
           style="background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.3);
-                 border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">
-          ↺ Réinitialiser semaine
+                 border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">
+          ↺ Réinitialiser
         </button>
       </div>
       <table class="jalons-table" id="jalons-tbody-table">
@@ -1588,10 +1688,11 @@
           <tr>
             <th style="width:110px">Jour</th>
             <th style="width:55px">Heure</th>
-            <th style="width:95px">Type</th>
+            <th style="width:90px">Type</th>
             <th>Description</th>
-            <th style="width:130px">Lieu</th>
-            <th style="width:80px">Statut</th>
+            <th style="width:100px">Responsable</th>
+            <th style="width:80px">Lieu</th>
+            <th style="width:75px">Statut</th>
             <th style="width:28px"></th>
           </tr>
         </thead>
@@ -1657,6 +1758,121 @@
 
 
 <div id="toast">✓ Journal enregistré</div>
+
+<!-- ── Bouton + Jalon fixe ─────────────────────────────── -->
+<button class="btn-jalon-fixe" onclick="ouvrirFicheJalon()" title="Créer un nouveau jalon / événement">
+  ＋ Jalon
+</button>
+
+<!-- ── Modale fiche rapide jalon ───────────────────────── -->
+<div class="jalon-modal-overlay" id="jalon-modal-overlay" onclick="if(event.target===this)fermerFicheJalon()">
+  <div class="jalon-modal">
+    <div class="jalon-modal-header">
+      <span style="font-size:18px">📌</span>
+      <h3 id="jalon-modal-titre">Nouveau jalon</h3>
+      <button onclick="fermerFicheJalon()"
+        style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0;line-height:1">✕</button>
+    </div>
+    <div class="jalon-modal-body">
+      <!-- Champs principaux -->
+      <div class="jalon-modal-grid2">
+        <div class="jalon-modal-row">
+          <label>Jour *</label>
+          <select id="jm-jour"></select>
+        </div>
+        <div class="jalon-modal-row">
+          <label>Heure *</label>
+          <input id="jm-heure" type="time" value="07:00">
+        </div>
+      </div>
+      <div class="jalon-modal-grid2">
+        <div class="jalon-modal-row">
+          <label>Type *</label>
+          <select id="jm-type"></select>
+        </div>
+        <div class="jalon-modal-row">
+          <label>Statut *</label>
+          <select id="jm-statut">
+            <option>À faire</option>
+            <option>En cours</option>
+            <option>Fait</option>
+            <option>Bloquant</option>
+            <option>Reporté</option>
+          </select>
+        </div>
+      </div>
+      <div class="jalon-modal-row">
+        <label>Description *</label>
+        <textarea id="jm-desc" placeholder="Ex : Réunion accès site, Validation PPSPS, Contrôle by-pass…" rows="3"></textarea>
+      </div>
+      <div class="jalon-modal-grid2">
+        <div class="jalon-modal-row">
+          <label>Responsable *</label>
+          <select id="jm-resp">
+            <option value="">— Sélectionner —</option>
+          </select>
+        </div>
+        <div class="jalon-modal-row">
+          <label>Ligne planning</label>
+          <select id="jm-ligne">
+            <option value="">— Aucune —</option>
+            <option>COORD</option>
+            <option>PRÉPA T45</option>
+            <option>PRÉPA T21</option>
+            <option>SÉCU</option>
+            <option>BY-PASS</option>
+          </select>
+        </div>
+      </div>
+      <!-- Options avancées -->
+      <details class="jalon-modal-advanced">
+        <summary>▸ Plus d'options</summary>
+        <div style="padding-top:10px">
+          <div class="jalon-modal-grid2">
+            <div class="jalon-modal-row">
+              <label>Lieu</label>
+              <input id="jm-lieu" type="text" placeholder="CE Rhisnes, Bureau, Teams…" list="lieu-datalist">
+              <datalist id="lieu-datalist">
+                <option>CE Rhisnes – Suarlée</option>
+                <option>Bureau chantier</option>
+                <option>Bureau d'études</option>
+                <option>Téléphone / Teams</option>
+                <option>SWDE — Namur</option>
+              </datalist>
+            </div>
+            <div class="jalon-modal-row">
+              <label>Entreprise / Interlocuteur</label>
+              <input id="jm-entreprise" type="text" placeholder="SWDE, Wanty, sous-traitant…">
+            </div>
+          </div>
+          <div class="jalon-modal-grid2">
+            <div class="jalon-modal-row">
+              <label>Réf. tâche</label>
+              <input id="jm-tache" type="text" placeholder="T45, T21, T40…">
+            </div>
+            <div class="jalon-modal-row">
+              <label>Priorité</label>
+              <select id="jm-priorite">
+                <option value="">Normale</option>
+                <option>Haute</option>
+                <option>Critique</option>
+              </select>
+            </div>
+          </div>
+          <div class="jalon-modal-row">
+            <label>Note courte</label>
+            <textarea id="jm-note" placeholder="GO indispensable avant…, À confirmer avec SWDE…" rows="2"></textarea>
+          </div>
+        </div>
+      </details>
+    </div>
+    <div class="jalon-modal-footer">
+      <button class="btn-del" id="jm-btn-del" onclick="supprimerFicheJalon()" style="display:none">Supprimer</button>
+      <button class="btn-save" onclick="enregistrerFicheJalon(false)">Enregistrer</button>
+      <button class="btn-save-place" onclick="enregistrerFicheJalon(true)">Enreg. + placer</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
@@ -2823,12 +3039,25 @@ const JALON_TYPES = {
 };
 
 const STATUT_TYPES = {
-  'PLANIFIÉ': { bg:'rgba(22,163,74,.2)',   color:'#86efac' },
-  'CRITIQUE': { bg:'rgba(220,38,38,.25)',  color:'#fca5a5' },
-  'FAIT':     { bg:'rgba(22,163,74,.4)',   color:'#4ade80' },
+  'À faire':  { bg:'rgba(100,116,139,.25)', color:'#94a3b8' },
+  'En cours': { bg:'rgba(59,130,246,.25)',  color:'#93c5fd' },
+  'Fait':     { bg:'rgba(22,163,74,.35)',   color:'#4ade80' },
+  'Bloquant': { bg:'rgba(220,38,38,.3)',    color:'#fca5a5' },
+  'Reporté':  { bg:'rgba(245,158,11,.25)', color:'#fcd34d' },
+  // Rétrocompat
+  'PLANIFIÉ': { bg:'rgba(100,116,139,.25)', color:'#94a3b8' },
+  'CRITIQUE': { bg:'rgba(220,38,38,.3)',    color:'#fca5a5' },
+  'FAIT':     { bg:'rgba(22,163,74,.35)',   color:'#4ade80' },
   'ANNULÉ':   { bg:'rgba(107,114,128,.3)', color:'#9ca3af' },
   'REPORTÉ':  { bg:'rgba(245,158,11,.25)', color:'#fcd34d' },
 };
+
+// Responsables disponibles (synchronisé avec le sélecteur utilisateur)
+const RESPONSABLES = [
+  'Jean-Jacques','Stéphane Lassaux',
+  'Chef équipe S1','Chef équipe V','Logistique',
+  'SWDE Exploitation','Bureau d\'études','Coord. sécu.','Sous-traitant'
+];
 
 const JALONS_PROJET = [
   { date: new Date(2026, 5,  1), heure:'07h00', type:'⚡ JALON', description:"Tâche 45 — Ouverture top CE + escalier colimaçon (DÉMARRAGE)", lieu:'CE Rhisnes – Suarlée', statut:'CRITIQUE', isProjet:true },
@@ -2838,12 +3067,12 @@ const JALONS_PROJET = [
 ];
 
 const JALONS_DEFAULT_S22 = [
-  { jour:1, heure:'08h00', type:'RÉUNION',  description:"Réunion lancement pré-mobilisation — Conducteur + Chefs d'équipe + Coord. Sécu", lieu:'Bureau chantier', statut:'PLANIFIÉ' },
-  { jour:2, heure:'08h30', type:'VISITE',   description:"Visite complète CE Rhisnes — Relevé accès top CE, état escalier colimaçon, zone échafaudage", lieu:'CE Rhisnes – Suarlée', statut:'PLANIFIÉ' },
-  { jour:3, heure:'14h00', type:'SÉCU',     description:"Coordination sécurité — Mise à jour PSS pour tâches 45 et 21 (travaux en hauteur, levage)", lieu:'Bureau chantier', statut:'PLANIFIÉ' },
-  { jour:4, heure:'09h00', type:'SWDE',     description:"Contact SWDE Exploitation — Suivi by-pass actif + confirmation planning vidange 03/08/26", lieu:'Téléphone / Teams', statut:'PLANIFIÉ' },
-  { jour:5, heure:'14h00', type:'⚡ JALON', description:"Validation plans T45 (ouverture top CE) + plan échafaudage T21 → GO pour 01/06", lieu:'Bureau chantier / BE', statut:'CRITIQUE' },
-  { jour:5, heure:'16h00', type:'RAPPORT',  description:"Rapport hebdomadaire — Synthèse préparatifs, points ouverts, planning semaine 01/06", lieu:'Bureau chantier', statut:'PLANIFIÉ' },
+  { jour:1, heure:'08h00', type:'RÉUNION',  description:"Réunion lancement pré-mobilisation — Conducteur + Chefs d'équipe + Coord. Sécu", lieu:'Bureau chantier', statut:'À faire', responsable:'Jean-Jacques' },
+  { jour:2, heure:'08h30', type:'VISITE',   description:"Visite complète CE Rhisnes — Relevé accès top CE, état escalier colimaçon, zone échafaudage", lieu:'CE Rhisnes – Suarlée', statut:'À faire', responsable:'Jean-Jacques' },
+  { jour:3, heure:'14h00', type:'SÉCU',     description:"Coordination sécurité — Mise à jour PSS pour tâches 45 et 21 (travaux en hauteur, levage)", lieu:'Bureau chantier', statut:'À faire', responsable:'Coord. sécu.' },
+  { jour:4, heure:'09h00', type:'SWDE',     description:"Contact SWDE Exploitation — Suivi by-pass actif + confirmation planning vidange 03/08/26", lieu:'Téléphone / Teams', statut:'À faire', responsable:'Jean-Jacques' },
+  { jour:5, heure:'14h00', type:'⚡ JALON', description:"Validation plans T45 (ouverture top CE) + plan échafaudage T21 → GO pour 01/06", lieu:'Bureau chantier / BE', statut:'Bloquant', responsable:'Stéphane Lassaux' },
+  { jour:5, heure:'16h00', type:'RAPPORT',  description:"Rapport hebdomadaire — Synthèse préparatifs, points ouverts, planning semaine 01/06", lieu:'Bureau chantier', statut:'À faire', responsable:'Jean-Jacques' },
 ];
 
 function getJalonsKey(weekNum) {
@@ -2892,6 +3121,27 @@ function buildDayOptions(weekNum, selected) {
 
 let _currentJalonsWeek = null;
 let _jalonsRows = [];
+let _jalonsFiltre = { type:'tous', resp:'', statut:'' };
+
+function jalonsSetFiltre(type, val) {
+  if (type === 'tous') {
+    _jalonsFiltre = { type:'tous', resp:'', statut:'' };
+    document.getElementById('jf-resp').value  = '';
+    document.getElementById('jf-statut').value = '';
+  } else {
+    _jalonsFiltre.type   = 'custom';
+    _jalonsFiltre[type]  = val || '';
+  }
+  renderJalons(_currentJalonsWeek);
+}
+
+function jalonsPopulateRespFilter() {
+  const sel = document.getElementById('jf-resp');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Responsable —</option>' +
+    RESPONSABLES.map(r => '<option value="'+r+'"'+(r===current?' selected':'')+'>'+r+'</option>').join('');
+}
 
 function renderJalons(weekNum) {
   _currentJalonsWeek = weekNum;
@@ -2911,6 +3161,15 @@ function renderJalons(weekNum) {
   });
 
   _jalonsRows = rows;
+
+  // Peupler le filtre responsable
+  jalonsPopulateRespFilter();
+
+  // Appliquer les filtres
+  let rowsFiltered = rows;
+  if (_jalonsFiltre.resp)   rowsFiltered = rowsFiltered.filter(r => (r.responsable||'') === _jalonsFiltre.resp);
+  if (_jalonsFiltre.statut) rowsFiltered = rowsFiltered.filter(r => (r.statut||'') === _jalonsFiltre.statut);
+
   tbody.innerHTML = '';
 
   if (rows.length === 0) {
@@ -2920,7 +3179,7 @@ function renderJalons(weekNum) {
     return;
   }
 
-  rows.forEach((row, idx) => {
+  rowsFiltered.forEach((row, idx) => {
     const isCritical = row.statut === 'CRITIQUE';
     const isProjet   = !!row.isProjet;
     const tr = document.createElement('tr');
@@ -2981,6 +3240,16 @@ function renderJalons(weekNum) {
     tdDesc.textContent = row.description || '';
     tdDesc.addEventListener('input', (function(i){ return function(){ jalonsUpdateRow(i,'description',this.innerText); }; })(idx));
 
+    // Cellule Responsable
+    const tdResp = document.createElement('td');
+    tdResp.style.cssText = 'padding:4px 6px';
+    const selResp = document.createElement('select');
+    selResp.setAttribute('style', ss);
+    selResp.innerHTML = '<option value="">—</option>' +
+      RESPONSABLES.map(r => '<option value="'+r+'"'+(r===(row.responsable||'')?' selected':'')+'>'+r+'</option>').join('');
+    selResp.addEventListener('change', (function(i){ return function(){ jalonsUpdateRow(i,'responsable',this.value); }; })(idx));
+    tdResp.appendChild(selResp);
+
     // Cellule Lieu
     const tdLieu = document.createElement('td');
     tdLieu.style.cssText = 'padding:4px 6px;font-size:11px;cursor:text;color:var(--muted)';
@@ -2994,13 +3263,34 @@ function renderJalons(weekNum) {
     const selStatut = document.createElement('select');
     selStatut.setAttribute('style', ss);
     selStatut.innerHTML = statutOptsHtml;
-    selStatut.addEventListener('change', (function(i){ return function(){ jalonsUpdateRow(i,'statut',this.value); }; })(idx));
+    selStatut.addEventListener('change', (function(i){ return function(){
+      jalonsUpdateRow(i,'statut',this.value);
+    }; })(idx));
     tdStatut.appendChild(selStatut);
+    const btnFait = document.createElement('button');
+    const isFait = (row.statut === 'Fait');
+    btnFait.title = isFait ? 'Marquer À faire' : 'Marquer Fait';
+    btnFait.textContent = isFait ? '↩' : '✓';
+    btnFait.setAttribute('style',
+      'background:none;border:none;color:' + (isFait ? 'var(--muted)' : 'var(--green)') +
+      ';cursor:pointer;font-size:13px;padding:0 0 0 4px;font-weight:700');
+    btnFait.addEventListener('click', (function(i){ return function(){
+      const cur = (_jalonsRows[i] || {}).statut || '';
+      jalonsUpdateRow(i, 'statut', cur === 'Fait' ? 'À faire' : 'Fait');
+      renderJalons(_currentJalonsWeek);
+    }; })(idx));
+    tdStatut.appendChild(btnFait);
 
     // Cellule Supprimer
     const tdDel = document.createElement('td');
     tdDel.style.cssText = 'padding:4px 2px;text-align:center';
     if (!isProjet) {
+      const btnEdit = document.createElement('button');
+      btnEdit.title = 'Modifier';
+      btnEdit.textContent = '✏';
+      btnEdit.setAttribute('style','background:none;border:none;color:var(--blue2);cursor:pointer;font-size:12px;padding:0 3px');
+      btnEdit.addEventListener('click', (function(i){ return function(){ ouvrirFicheJalon(i); }; })(idx));
+      tdDel.appendChild(btnEdit);
       const btn = document.createElement('button');
       btn.title = 'Supprimer';
       btn.textContent = '✕';
@@ -3013,14 +3303,17 @@ function renderJalons(weekNum) {
     tr.appendChild(tdHeure);
     tr.appendChild(tdType);
     tr.appendChild(tdDesc);
+    tr.appendChild(tdResp);
     tr.appendChild(tdLieu);
     tr.appendChild(tdStatut);
     tr.appendChild(tdDel);
     tbody.appendChild(tr);
   });
 
-  const n = rows.length;
-  document.getElementById('jalons-count').textContent = n + ' événement' + (n > 1 ? 's' : '');
+  const n = rowsFiltered.length;
+  const nTotal = rows.length;
+  document.getElementById('jalons-count').textContent =
+    n + ' événement' + (n > 1 ? 's' : '') + (n < nTotal ? ' (filtrés sur '+nTotal+')' : '');
   document.getElementById('jalons-title').textContent = 'Jalons & Réunions — Semaine ' + weekNum;
 }
 
@@ -3031,7 +3324,7 @@ function jalonsUpdateRow(idx, field, value) {
 }
 
 function jalonsAddRow() {
-  _jalonsRows.push({ jour: 0, heure: '08h00', type: 'RÉUNION', description: '', lieu: '', statut: 'PLANIFIÉ' });
+  _jalonsRows.push({ jour: 0, heure: '08h00', type: 'RÉUNION', description: '', lieu: '', statut: 'À faire', responsable: '' });
   saveJalonsForWeek(_currentJalonsWeek, _jalonsRows);
   renderJalons(_currentJalonsWeek);
 }
@@ -3046,6 +3339,119 @@ function jalonsDeleteRow(idx) {
 function jalonsReset() {
   if (!confirm('Réinitialiser tous les jalons de la semaine ' + _currentJalonsWeek + ' ?')) return;
   localStorage.removeItem(getJalonsKey(_currentJalonsWeek));
+  renderJalons(_currentJalonsWeek);
+}
+
+// ── Fiche rapide jalon ────────────────────────────────────────
+let _ficheEditIdx = null; // null = création, number = édition
+
+function ouvrirFicheJalon(idx, prefill) {
+  _ficheEditIdx = (typeof idx === 'number') ? idx : null;
+
+  // Titre
+  document.getElementById('jalon-modal-titre').textContent =
+    _ficheEditIdx !== null ? 'Modifier le jalon' : 'Nouveau jalon';
+
+  // Bouton supprimer
+  const btnDel = document.getElementById('jm-btn-del');
+  btnDel.style.display = (_ficheEditIdx !== null && !(_jalonsRows[_ficheEditIdx]||{}).isProjet) ? '' : 'none';
+
+  // Peupler le select Jour
+  const selJour = document.getElementById('jm-jour');
+  selJour.innerHTML = buildDayOptions(_currentJalonsWeek, -1);
+
+  // Peupler le select Type
+  const selType = document.getElementById('jm-type');
+  selType.innerHTML = Object.keys(JALON_TYPES).map(t => '<option>'+t+'</option>').join('');
+
+  // Peupler le select Responsable
+  const selResp = document.getElementById('jm-resp');
+  selResp.innerHTML = '<option value="">— Sélectionner —</option>' +
+    RESPONSABLES.map(r => '<option>'+r+'</option>').join('');
+
+  // Valeurs par défaut ou existantes
+  let row = {};
+  if (_ficheEditIdx !== null && _jalonsRows[_ficheEditIdx]) {
+    row = _jalonsRows[_ficheEditIdx];
+  } else if (prefill) {
+    row = prefill;
+  }
+
+  selJour.value        = typeof row.jour === 'number' ? row.jour : 0;
+  document.getElementById('jm-heure').value      = (row.heure || '07:00').replace('h',':');
+  selType.value        = row.type || 'RÉUNION';
+  document.getElementById('jm-statut').value     = row.statut || 'À faire';
+  document.getElementById('jm-desc').value       = row.description || '';
+  selResp.value        = row.responsable || '';
+  document.getElementById('jm-ligne').value      = row.lignePlanning || '';
+  document.getElementById('jm-lieu').value       = row.lieu || '';
+  document.getElementById('jm-entreprise').value = row.entreprise || '';
+  document.getElementById('jm-tache').value      = row.refTache || '';
+  document.getElementById('jm-priorite').value   = row.priorite || '';
+  document.getElementById('jm-note').value       = row.note || '';
+
+  document.getElementById('jalon-modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('jm-desc').focus(), 100);
+}
+
+function fermerFicheJalon() {
+  document.getElementById('jalon-modal-overlay').classList.remove('open');
+  _ficheEditIdx = null;
+}
+
+function enregistrerFicheJalon(placerAuPlanning) {
+  const desc = document.getElementById('jm-desc').value.trim();
+  const type = document.getElementById('jm-type').value;
+  const resp = document.getElementById('jm-resp').value;
+  const jour = parseInt(document.getElementById('jm-jour').value, 10);
+
+  if (!desc) { document.getElementById('jm-desc').focus(); return; }
+  if (!type) { document.getElementById('jm-type').focus(); return; }
+
+  // Convertir heure HH:MM → HHhMM
+  const heureRaw = document.getElementById('jm-heure').value || '07:00';
+  const heure = heureRaw.replace(':', 'h');
+
+  const newRow = {
+    jour,
+    heure,
+    type,
+    statut:        document.getElementById('jm-statut').value || 'À faire',
+    description:   desc,
+    responsable:   resp,
+    lignePlanning: document.getElementById('jm-ligne').value,
+    lieu:          document.getElementById('jm-lieu').value,
+    entreprise:    document.getElementById('jm-entreprise').value,
+    refTache:      document.getElementById('jm-tache').value,
+    priorite:      document.getElementById('jm-priorite').value,
+    note:          document.getElementById('jm-note').value,
+  };
+
+  if (_ficheEditIdx !== null) {
+    // Conserver isProjet si édition
+    if (_jalonsRows[_ficheEditIdx]?.isProjet) newRow.isProjet = true;
+    _jalonsRows[_ficheEditIdx] = newRow;
+  } else {
+    _jalonsRows.push(newRow);
+  }
+
+  saveJalonsForWeek(_currentJalonsWeek, _jalonsRows);
+  fermerFicheJalon();
+  renderJalons(_currentJalonsWeek);
+
+  // Optionnel : switcher sur l'onglet planning si "Enreg. + placer"
+  if (placerAuPlanning) {
+    const tabPlanning = document.querySelector('.tab-btn[onclick*=\'planning\']');
+    if (tabPlanning) tabPlanning.click();
+  }
+}
+
+function supprimerFicheJalon() {
+  if (_ficheEditIdx === null) return;
+  if (!confirm('Supprimer ce jalon ?')) return;
+  _jalonsRows.splice(_ficheEditIdx, 1);
+  saveJalonsForWeek(_currentJalonsWeek, _jalonsRows);
+  fermerFicheJalon();
   renderJalons(_currentJalonsWeek);
 }
 
