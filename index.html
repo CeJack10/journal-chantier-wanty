@@ -1,4 +1,4 @@
-<!-- BUILD:1780261498 -->
+<!-- BUILD:1780514365 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -885,19 +885,80 @@
       <div class="grid-2">
         <div class="field">
           <label>Phase en cours <span class="req">*</span></label>
-          <select id="f-phase">
-            <option value="">— Sélectionner —</option>
+          <input id="f-phase" list="phase-datalist"
+            placeholder="Sélectionner ou saisir librement…"
+            autocomplete="off"
+            style="width:100%">
+          <datalist id="phase-datalist">
+            <!-- ── Phases générales ── -->
             <option>Études / Préparation</option>
             <option>Installation de chantier</option>
+            <option>Pré-mobilisation</option>
             <option>Terrassement / Décapage</option>
             <option>Fondations</option>
             <option>Génie civil / Structure</option>
             <option>Ouvrages hydrauliques</option>
-            <option>Maçonnerie / Béton</option>
+            <option>Maçonnerie / Béton armé</option>
             <option>Charpente / Couverture</option>
-            <option>Finitions</option>
+            <option>Finitions intérieures</option>
             <option>Réception / Levée réserves</option>
-          </select>
+            <!-- ── CE Rhisnes — phases spécifiques ── -->
+            <option>Inspection CE Rhisnes — in situ</option>
+            <option>Réparations béton — plafond cave</option>
+            <option>Réfection conduites condensat + structures portantes</option>
+            <option>By-pass actif — surveillance réseau SWDE</option>
+            <option>Ouverture top CE + Démontage escalier colimaçon (T45)</option>
+            <option>Réfection trappe top CE</option>
+            <option>Montage échafaudage extérieur + lift (T21)</option>
+            <option>Démontage bardage + isolation sphère</option>
+            <option>Inspection extérieure sphère</option>
+            <option>Pose protection anticorrosion sphère</option>
+            <option>Pose isolation + bardage sphère</option>
+            <option>Thermo-bâchage sphère</option>
+            <option>By-pass + vidange CE SWDE (T46)</option>
+            <option>Démontage tuyauteries + câblage électrique</option>
+            <option>Pose échafaudage intérieur réservoir</option>
+            <option>Nettoyage fond réservoir</option>
+            <option>Pose revêtement epoxy intérieur</option>
+            <option>Pose échelles + fixations accès cuve</option>
+            <option>Protection anticorrosion intérieure</option>
+            <option>Pose nouvelles tuyauteries + raccordement</option>
+            <option>Nettoyage &amp; Désinfection cuve</option>
+            <option>Pose nouvelle porte + hublots</option>
+            <option>Travaux EM — équipements généraux</option>
+            <option>Connexion système monitoring</option>
+            <option>Remise en état site + démontage installation</option>
+            <option>Réception provisoire</option>
+            <option>Levée réserves + réception définitive</option>
+          </datalist>
+
+          <!-- Datalist partagé pour Fonction personnel -->
+          <datalist id="fonction-datalist">
+            <option>Conducteur de travaux</option>
+            <option>Conducteur principal</option>
+            <option>Chef de chantier</option>
+            <option>Chef d'équipe</option>
+            <option>Technicien de chantier</option>
+            <option>Coordinateur sécurité (CSPS)</option>
+            <option>Ouvrier maçon</option>
+            <option>Ouvrier terrassier</option>
+            <option>Ferrailleur</option>
+            <option>Coffreur</option>
+            <option>Soudeur</option>
+            <option>Tuyauteur</option>
+            <option>Électricien</option>
+            <option>Grutier</option>
+            <option>Mécanicien engins</option>
+            <option>Chauffeur poids lourd</option>
+            <option>Opérateur pelle</option>
+            <option>Peintre anticorrosion</option>
+            <option>Étancheur</option>
+            <option>Inspecteur SWDE</option>
+            <option>Ingénieur BE</option>
+            <option>Sous-traitant</option>
+            <option>Visiteur</option>
+            <option>Autre</option>
+          </datalist>
         </div>
         <div class="field">
           <label>% Avancement global estimé</label>
@@ -1789,11 +1850,14 @@ function renderPersonnel() {
     tr.innerHTML = `
       <td><input type="text" value="${p.nom}" placeholder="Nom ou entreprise"
            onchange="updatePersonnel(${p.id},'nom',this.value)"></td>
-      <td><select onchange="updatePersonnel(${p.id},'fonction',this.value)">
-        ${['Conducteur de travaux','Chef de chantier','Ouvrier maçon','Ouvrier terrassier',
-           'Ferrailleur','Coffreur','Grutier','Mécanicien engins','Chauffeur','Sous-traitant','Visiteur','Autre']
-          .map(f=>`<option${f===p.fonction?' selected':''}>${f}</option>`).join('')}
-      </select></td>
+      <td>
+        <input type="text" list="fonction-datalist"
+          value="${p.fonction}"
+          placeholder="Fonction…"
+          autocomplete="off"
+          style="min-width:160px"
+          onchange="updatePersonnel(${p.id},'fonction',this.value)">
+      </td>
       <td><input type="time" value="${p.hdeb}" onchange="updatePersonnel(${p.id},'hdeb',this.value)"></td>
       <td><input type="time" value="${p.hfin}" onchange="updatePersonnel(${p.id},'hfin',this.value)"></td>
       <td><input type="text" id="h-${p.id}" readonly style="text-align:center"></td>
