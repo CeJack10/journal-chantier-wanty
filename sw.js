@@ -1,6 +1,6 @@
 // Service Worker — Journal WANTY
 // Cache auto-invalidé par timestamp à chaque déploiement
-const CACHE = 'journal-wanty-1780518718';
+const CACHE = 'journal-wanty-1780603294';
 
 const STATIC_ASSETS = [
   './manifest.json',
