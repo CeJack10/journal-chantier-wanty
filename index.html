@@ -1,4 +1,4 @@
-<!-- BUILD:v2 -->
+<!-- BUILD:v3 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -857,7 +857,7 @@
           <input type="text" id="f-semaine" readonly>
         </div>
         <div class="field">
-          <label>Gestionnaire <span class="auto">AUTO</span></label>
+          <label>Responsable <span class="auto">AUTO</span></label>
           <input type="text" id="f-gestionnaire" value="Jean-Jacques" onchange="syncGestionnaireToChip(this.value)">
         </div>
         <div class="field">
@@ -869,7 +869,7 @@
             <option value="W-003">W-003 — Murs anti-bruit SPW (Wavre)</option>
             <option value="CE-001" selected>CE-001 — CE Rhisnes / SWDE (Suarlée)</option>
           </select>
-          <input type="text" id="f-chantier-note" placeholder="Précision, zone, lot…" style="margin-top:5px;width:100%;box-sizing:border-box;" oninput="saveDraftAuto && saveDraftAuto()">
+          <input type="text" id="f-chantier-note" placeholder="Ex. Zone B, appui 2, lot terrassement" style="margin-top:5px;width:100%;box-sizing:border-box;" oninput="saveDraftAuto && saveDraftAuto()">
         </div>
         <div class="field">
           <label>Client <span class="auto">AUTO</span></label>
@@ -877,7 +877,16 @@
         </div>
         <div class="field">
           <label>N° Journal <span class="auto">AUTO</span></label>
-          <input type="text" id="f-num-journal" placeholder="Ex: 202508031" title="Format Wanty : AAAAMMJJSÉQ — éditable" style="cursor:text" oninput="this.dataset.manual='1'">
+          <input type="text" id="f-num-journal" placeholder="Ex: 202506041" title="Format Wanty : AAAAMMJJSÉQ — éditable" style="cursor:text" oninput="this.dataset.manual='1'">
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Statut du journal</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+            <label style="cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface2)"><input type="radio" name="statut-journal" value="brouillon" checked onchange="updateJournalStatutChip(this.value)"> 📝 Brouillon</label>
+            <label style="cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface2)"><input type="radio" name="statut-journal" value="a-valider" onchange="updateJournalStatutChip(this.value)"> 🔍 À valider</label>
+            <label style="cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface2)"><input type="radio" name="statut-journal" value="valide" onchange="updateJournalStatutChip(this.value)"> ✅ Validé</label>
+            <label style="cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface2)"><input type="radio" name="statut-journal" value="diffuse" onchange="updateJournalStatutChip(this.value)"> 📤 Diffusé</label>
+          </div>
         </div>
       </div>
     </div>
@@ -917,8 +926,9 @@
           </div>
         </div>
         <div class="field">
-          <label>Heures perdues intempérie</label>
+          <label>Heures perdues <span id="heures-intemperie-req" style="color:var(--red);display:none">*</span></label>
           <input type="number" id="f-heures-intemperie" value="0" min="0" max="10" step="0.5" placeholder="0h">
+          <div id="heures-intemperie-alert" style="display:none;font-size:11px;color:var(--red);margin-top:3px">⚠ Indique les heures perdues si intempérie déclarée</div>
         </div>
       </div>
     </div>
@@ -946,7 +956,10 @@
         </thead>
         <tbody id="personnel-tbody"></tbody>
       </table>
-      <button class="btn-add" onclick="addPersonnel()">＋ Ajouter une personne</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+        <button class="btn-add" onclick="addPersonnel()">＋ Ajouter un intervenant</button>
+        <button type="button" onclick="copyYesterdayTeam()" style="font-size:12px;padding:6px 12px;border:1px dashed var(--muted);border-radius:6px;background:transparent;color:var(--muted);cursor:pointer" title="Recopier le personnel du dernier journal enregistré">👥 Même équipe qu'hier</button>
+      </div>
     </div>
   </div>
 
@@ -1045,17 +1058,30 @@
         </div>
       </div>
       <div class="field" style="margin-top:14px">
-        <label>Travaux réalisés aujourd'hui <span class="req">*</span></label>
-        <textarea id="f-travaux" placeholder="Décrire les travaux effectués, les zones concernées, les quantités mises en œuvre…" rows="4"></textarea>
+        <label>Travaux du jour <span class="req">*</span></label>
+        <textarea id="f-travaux" placeholder="Ex. Coulage semelle S3 — 24 m³ béton C30/37, ferraillage voile V2…" rows="4"></textarea>
       </div>
       <div class="grid-2" style="margin-top:14px">
         <div class="field">
-          <label>Travaux prévus demain</label>
-          <textarea id="f-travaux-demain" placeholder="Planning J+1…" rows="3"></textarea>
+          <label>Travaux de demain</label>
+          <textarea id="f-travaux-demain" placeholder="Ex. Pose armatures voile V2, installation échafaudage…" rows="3"></textarea>
+          <button type="button" onclick="creerTacheJ1()" style="margin-top:5px;font-size:11px;padding:4px 10px;border:1px dashed var(--blue2);border-radius:5px;background:transparent;color:var(--blue2);cursor:pointer" title="Créer un jalon dans le planning semaine à partir des travaux de demain">📅 Créer tâche J+1 → Planning</button>
         </div>
         <div class="field">
-          <label>Points bloquants / Réserves</label>
-          <textarea id="f-blocages" placeholder="Problèmes techniques, manque matériaux, attente plan…" rows="3"></textarea>
+          <label>Blocages / réserves</label>
+          <select id="f-blocage-cat" style="margin-bottom:5px;width:100%">
+            <option value="">— Catégorie (optionnel) —</option>
+            <option>Plan / étude</option>
+            <option>Approvisionnement / matériaux</option>
+            <option>Météo / intempérie</option>
+            <option>Accès / voirie</option>
+            <option>Qualité / non-conformité</option>
+            <option>Sous-traitant</option>
+            <option>Client / MOA</option>
+            <option>Sécurité</option>
+            <option>Autre</option>
+          </select>
+          <textarea id="f-blocages" placeholder="Ex. Attente plan béton armé indice D, livraison acier retardée…" rows="3"></textarea>
         </div>
       </div>
     </div>
@@ -1065,24 +1091,24 @@
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)">
       <span class="icon">🚜</span>
-      <h3>Engins & Matériaux</h3>
+      <h3>Ressources & logistique</h3>
       <span class="toggle">▼</span>
     </div>
     <div class="section-body">
       <div class="grid-2">
         <div class="field">
-          <label>Engins présents sur chantier</label>
-          <textarea id="f-engins" placeholder="Ex: Pelle CAT 320 — 8h, Camion benne 6×4 — 4h…" rows="3"></textarea>
+          <label>Engins présents <span style="font-size:10px;color:var(--muted);font-style:italic">— complété dans le tableau ci-dessous</span></label>
+          <textarea id="f-engins" placeholder="Ex. Pelle 15T — 8h, Dumper 6T — 4h, Grue 25T…" rows="2"></textarea>
         </div>
         <div class="field">
-          <label>Livraisons reçues</label>
-          <textarea id="f-livraisons" placeholder="Ex: 20T béton C25/30, 50m² coffrages, etc." rows="3"></textarea>
+          <label>Livraisons reçues <span style="font-size:10px;color:var(--muted);font-style:italic">— détailler dans le tableau</span></label>
+          <textarea id="f-livraisons" placeholder="Ex. 60 m³ béton C30/37, armatures HA…" rows="2"></textarea>
         </div>
       </div>
       <div class="grid-2" style="margin-top:14px">
         <div class="field">
-          <label>N° bon de livraison</label>
-          <input type="text" id="f-bon-livraison" placeholder="Ex: BL-2026-0548 / CMR / référence fournisseur…">
+          <label>Réf. BL / CMR</label>
+          <input type="text" id="f-bon-livraison" placeholder="Ex. BL-2026-0548 / CMR-xxx">
         </div>
         <div class="field">
           <label>Sous-traitants présents</label>
@@ -1091,12 +1117,12 @@
       </div>
       <div class="grid-2" style="margin-top:14px">
         <div class="field">
-          <label>Commandes à passer</label>
-          <textarea id="f-commandes" placeholder="Matériaux à commander pour J+2…" rows="2"></textarea>
+          <label>Commandes à prévoir</label>
+          <textarea id="f-commandes" placeholder="Ex. Acier HA, béton J+2, blindage, géotextile…" rows="2"></textarea>
         </div>
         <div class="field">
-          <label>Observations livraison</label>
-          <textarea id="f-livraison-note" placeholder="Conformité, quantité, retard, refus, contrôle réception…" rows="2"></textarea>
+          <label>Contrôle réception</label>
+          <textarea id="f-livraison-note" placeholder="Conforme / partiel / refusé / retard — référence BL…" rows="2"></textarea>
         </div>
       </div>
     </div>
@@ -1276,19 +1302,19 @@
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)">
       <span class="icon">📝</span>
-      <h3>Remarques & Notes libres</h3>
+      <h3>Transmission / remarques</h3>
       <span class="toggle">▼</span>
     </div>
     <div class="section-body">
-      <textarea id="f-remarques" placeholder="Observations diverses, décisions prises, informations à transmettre à la direction…" rows="4"></textarea>
+      <textarea id="f-remarques" placeholder="Décisions prises, infos à transmettre à la direction, points de vigilance, instructions J+1…" rows="4"></textarea>
     </div>
   </div>
 
   <!-- ACTIONS -->
   <div class="actions">
-    <button class="btn-primary" onclick="saveJournal()">💾 Enregistrer le journal</button>
-    <button class="btn-export" onclick="exportJournal()">📄 Exporter PDF</button>
-    <button class="btn-secondary" onclick="clearForm()">🗑 Nouveau journal</button>
+    <button class="btn-primary" onclick="saveJournal()">💾 Enregistrer</button>
+    <button class="btn-export" onclick="exportJournal()">📄 Export PDF</button>
+    <button class="btn-secondary" onclick="clearForm()">🗑 Nouveau</button>
     <button class="btn-secondary" onclick="toggleHistory()">📚 Historique</button>
   </div>
   <!-- BARRE BACKUP -->
@@ -2046,6 +2072,56 @@ async function fetchMeteo(lat, lon, chantierNom) {
 // ═══════════════════════════════════════════════════════════════════
 //  CHANTIER CHANGE
 // ═══════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════
+//  STATUT JOURNAL
+// ═══════════════════════════════════════════════════════════════════
+function updateJournalStatutChip(val) {
+  // Optionnel : afficher le statut dans le chip du header si présent
+  const labels = { 'brouillon':'📝 Brouillon','a-valider':'🔍 À valider','valide':'✅ Validé','diffuse':'📤 Diffusé' };
+  // Rien de plus pour l'instant — collectData lit la valeur radio
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  MÊME ÉQUIPE QU'HIER
+// ═══════════════════════════════════════════════════════════════════
+function copyYesterdayTeam() {
+  const hist = JSON.parse(localStorage.getItem('journals') || '[]');
+  if (!hist.length) { showToast('Aucun journal précédent trouvé.'); return; }
+  const prev = hist[0];
+  if (!prev.personnel || !prev.personnel.length) { showToast('Pas de personnel dans le dernier journal.'); return; }
+  if (!confirm('Reprendre l'équipe du journal du ' + (prev.date || '?') + ' (' + prev.personnel.length + ' personne(s)) ?')) return;
+  personnelData = prev.personnel.map(p => ({ ...p, id: Date.now() + Math.random() }));
+  renderPersonnel();
+  showToast('✓ Équipe reprise depuis le dernier journal.');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  CRÉER TÂCHE J+1 → PLANNING
+// ═══════════════════════════════════════════════════════════════════
+function creerTacheJ1() {
+  const texte = (document.getElementById('f-travaux-demain')?.value || '').trim();
+  if (!texte) { showToast('Saisis d'abord les travaux de demain.'); return; }
+  // Calculer semaine suivante (ou semaine courante si fin de semaine)
+  const weekInput = document.getElementById('plan-semaine-input');
+  const weekNum   = weekInput ? parseInt(weekInput.value) : null;
+  // Ouvrir la fiche jalon pré-remplie
+  if (typeof ouvrirFicheJalon === 'function') {
+    switchTab('planning', document.querySelector('.tab-btn[onclick*="planning"]'));
+    setTimeout(() => {
+      ouvrirFicheJalon(null, {
+        description: texte,
+        type: 'Tâche',
+        statut: 'À faire',
+        responsable: document.getElementById('f-gestionnaire')?.value || '',
+      });
+    }, 300);
+    showToast('📅 Fiche tâche J+1 ouverte dans le planning.');
+  } else {
+    showToast('Ouvre l'onglet Planning puis utilise "+ Jalon".');
+  }
+}
+
 function onChantierChange() {
   const ch = document.getElementById('f-chantier').value;
   if (!ch) { document.getElementById('f-client').value=''; return; }
@@ -2137,7 +2213,13 @@ function loadPersonnelFromMemory(ch) {
 function onIntemperieChange() {
   const val = document.querySelector('input[name=intemperie]:checked')?.value;
   const chip = document.getElementById('intemperie-chip');
-  chip.style.display = val==='oui' ? 'flex' : 'none';
+  if (chip) chip.style.display = val==='oui' ? 'flex' : 'none';
+  // Alerte heures perdues conditionnelle
+  const req   = document.getElementById('heures-intemperie-req');
+  const alert = document.getElementById('heures-intemperie-alert');
+  const show  = val === 'oui';
+  if (req)   req.style.display   = show ? '' : 'none';
+  if (alert) alert.style.display = show ? '' : 'none';
 }
 function onIncidentChange() {
   const val = document.querySelector('input[name=incident]:checked')?.value;
@@ -2602,6 +2684,8 @@ function collectData() {
     photoNote:    document.getElementById('f-photo-note').value,
     nbPhotos:     photos.length,
     remarques:    document.getElementById('f-remarques').value,
+    blocageCat:   document.getElementById('f-blocage-cat')?.value||'',
+    statutJournal:document.querySelector('input[name=statut-journal]:checked')?.value||'brouillon',
     savedAt:      new Date().toISOString(),
   };
 }
