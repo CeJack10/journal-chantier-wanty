@@ -1,4 +1,4 @@
-<!-- BUILD:v5 -->
+<!-- BUILD:v6 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -2202,13 +2202,13 @@ function updateJournalStatutChip(val) {
 // ═══════════════════════════════════════════════════════════════════
 function copyYesterdayTeam() {
   const hist = JSON.parse(localStorage.getItem('journals') || '[]');
-  if (!hist.length) { showToast('Aucun journal précédent trouvé.'); return; }
+  if (!hist.length) { showToast("Aucun journal précédent trouvé."); return; }
   const prev = hist[0];
-  if (!prev.personnel || !prev.personnel.length) { showToast('Pas de personnel dans le dernier journal.'); return; }
-  if (!confirm('Reprendre l'équipe du journal du ' + (prev.date || '?') + ' (' + prev.personnel.length + ' personne(s)) ?')) return;
+  if (!prev.personnel || !prev.personnel.length) { showToast("Pas de personnel dans le dernier journal."); return; }
+  if (!confirm(`Reprendre l'équipe du journal du ${prev.date || '?'} (${prev.personnel.length} personne(s)) ?`)) return;
   personnelData = prev.personnel.map(p => ({ ...p, id: Date.now() + Math.random() }));
   renderPersonnel();
-  showToast('✓ Équipe reprise depuis le dernier journal.');
+  showToast("✓ Équipe reprise depuis le dernier journal.");
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2216,7 +2216,7 @@ function copyYesterdayTeam() {
 // ═══════════════════════════════════════════════════════════════════
 function creerTacheJ1() {
   const texte = (document.getElementById('f-travaux-demain')?.value || '').trim();
-  if (!texte) { showToast('Saisis d'abord les travaux de demain.'); return; }
+  if (!texte) { showToast("Saisis d'abord les travaux de demain."); return; }
   // Calculer semaine suivante (ou semaine courante si fin de semaine)
   const weekInput = document.getElementById('plan-semaine-input');
   const weekNum   = weekInput ? parseInt(weekInput.value) : null;
@@ -2233,7 +2233,7 @@ function creerTacheJ1() {
     }, 300);
     showToast('📅 Fiche tâche J+1 ouverte dans le planning.');
   } else {
-    showToast('Ouvre l'onglet Planning puis utilise "+ Jalon".');
+    showToast("Ouvre l'onglet Planning puis utilise \"+ Jalon\".");
   }
 }
 
@@ -4249,7 +4249,7 @@ function sauvegarderNouveauChantier() {
   if (!nom)    { alert('Le nom du chantier est obligatoire.'); return; }
   if (!client) { alert('Sélectionne ou indique le client.'); return; }
   if (!/^\d{7,12}$/.test(num)) { alert('Le numéro Wanty doit contenir entre 7 et 12 chiffres (ex. 202508052).'); return; }
-  if (CHANTIERS[num]) { alert('Ce numéro existe déjà : ' + CHANTIERS[num].nom); return; }
+  if (CHANTIERS[num]) { alert(`Ce numéro existe déjà : ${CHANTIERS[num].nom}`); return; }
 
   // Ajouter en mémoire
   CHANTIERS[num] = { client, nom, adresse, lat, lon };
@@ -4313,7 +4313,7 @@ function detecterGPS() {
         // Charger la météo du site le plus proche
         fetchMeteo(proche.info.lat, proche.info.lon, proche.info.nom);
         // Proposer de sélectionner ce chantier
-        const msg = 'Chantier le plus proche : ' + proche.key + ' — ' + proche.info.nom + '\nDistance : ' + distTxt + '\n\nSélectionner ce chantier ?';
+        const msg = `Chantier le plus proche : ${proche.key} — ${proche.info.nom}\nDistance : ${distTxt}\n\nSélectionner ce chantier ?`;
         if (confirm(msg)) {
           const input = document.getElementById('f-chantier');
           if (input) { input.value = proche.key + ' — ' + proche.info.nom; onChantierChange(); }
