@@ -1,4 +1,4 @@
-<!-- BUILD:v4 -->
+<!-- BUILD:v5 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -760,6 +760,58 @@
     .tab-btn { padding: 11px 14px; font-size: 12px; }
   }
 
+
+  /* ── Modal nouveau chantier ──────────────────────────── */
+  .chantier-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.65); z-index: 1100;
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  .chantier-modal-overlay.open { display: flex; }
+  .chantier-modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; width: 100%; max-width: 480px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.5);
+  }
+  .chantier-modal-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+  }
+  .chantier-modal-header h3 { margin:0; font-size:15px; flex:1; }
+  .chantier-modal-body { padding: 18px 20px; display:flex; flex-direction:column; gap:12px; }
+  .chantier-modal-row label { display:block; font-size:11px; color:var(--muted); margin-bottom:4px; }
+  .chantier-modal-row input, .chantier-modal-row select {
+    width: 100%; padding: 8px 10px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--text); font-size: 13px; box-sizing: border-box;
+  }
+  .chantier-modal-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .chantier-modal-footer {
+    display:flex; justify-content:flex-end; gap:8px;
+    padding: 14px 20px; border-top: 1px solid var(--border);
+  }
+  .btn-gps-detect {
+    font-size:11px; padding:5px 10px; border:1px solid var(--blue2);
+    border-radius:5px; background:transparent; color:var(--blue2);
+    cursor:pointer; margin-top:4px; white-space:nowrap;
+  }
+  .btn-gps-detect:hover { background: rgba(46,117,182,.15); }
+  /* Bouton + ajout chantier inline */
+  .btn-add-chantier {
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:11px; padding:4px 9px; margin-top:5px;
+    border:1px dashed var(--blue2); border-radius:5px;
+    background:transparent; color:var(--blue2); cursor:pointer;
+  }
+  .btn-add-chantier:hover { background: rgba(46,117,182,.12); }
+  /* Bouton GPS bannière */
+  .btn-gps-banner {
+    font-size:11px; padding:4px 9px; border:1px solid var(--border);
+    border-radius:5px; background:var(--surface2); color:var(--muted);
+    cursor:pointer; white-space:nowrap; align-self:flex-start; margin-top:4px;
+  }
+  .btn-gps-banner:hover { border-color:var(--blue2); color:var(--blue2); }
+
 </style>
 </head>
 <body>
@@ -824,6 +876,7 @@
     <div class="weather-main">
       <h2 id="w-chantier-label">Chargement météo…</h2>
       <div id="w-adresse" style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:4px;cursor:pointer;display:none" title="Cliquer pour modifier" onclick="editAdresseChantier()">📍 —</div>
+      <button class="btn-gps-banner" onclick="detecterGPS()" title="Détecter ma position GPS et charger la météo du site le plus proche">📡 Localiser</button>
       <div class="temp" id="w-temp">--°C</div>
       <div class="desc" id="w-desc">—</div>
     </div>
@@ -873,6 +926,7 @@
             <option value="202503121 — Murs anti-bruit SPW – Wavre">
             <option value="202508031 — CE Rhisnes / SWDE (Suarlée)">
           </datalist>
+          <button type="button" class="btn-add-chantier" onclick="ouvrirModalNouveauChantier()">＋ Nouveau chantier</button>
           <input type="text" id="f-chantier-note" placeholder="Ex. Zone B, appui 2, lot terrassement" style="margin-top:5px;width:100%;box-sizing:border-box;" oninput="saveDraftAuto && saveDraftAuto()">
         </div>
         <div class="field">
@@ -1798,6 +1852,63 @@
 </button>
 
 <!-- ── Modale fiche rapide jalon ───────────────────────── -->
+
+<!-- ── MODAL NOUVEAU CHANTIER ───────────────────────────────── -->
+<div class="chantier-modal-overlay" id="chantier-modal-overlay" onclick="if(event.target===this)fermerModalNouveauChantier()">
+  <div class="chantier-modal">
+    <div class="chantier-modal-header">
+      <span style="font-size:20px">🏗</span>
+      <h3>Nouveau chantier</h3>
+      <button onclick="fermerModalNouveauChantier()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 4px">✕</button>
+    </div>
+    <div class="chantier-modal-body">
+      <div class="chantier-modal-row">
+        <label>N° Wanty <span style="color:var(--red)">*</span> <span style="color:var(--muted);font-style:italic">(format AAAAMMJJSÉQ)</span></label>
+        <input type="text" id="cm-num" placeholder="Ex. 202508052" maxlength="12">
+      </div>
+      <div class="chantier-modal-row">
+        <label>Nom du chantier <span style="color:var(--red)">*</span></label>
+        <input type="text" id="cm-nom" placeholder="Ex. Station de pompage – Namur">
+      </div>
+      <div class="chantier-modal-grid2">
+        <div class="chantier-modal-row">
+          <label>Client <span style="color:var(--red)">*</span></label>
+          <select id="cm-client">
+            <option value="">— Client —</option>
+            <option>SWDE</option>
+            <option>Vivaqua</option>
+            <option>SPW</option>
+            <option>INASEP</option>
+            <option>Privé</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="chantier-modal-row">
+          <label>Client (autre)</label>
+          <input type="text" id="cm-client-autre" placeholder="Si 'Autre'">
+        </div>
+      </div>
+      <div class="chantier-modal-row">
+        <label>Adresse</label>
+        <input type="text" id="cm-adresse" placeholder="Ex. Rue des Vignes 12, 5000 Namur">
+      </div>
+      <div class="chantier-modal-row">
+        <label>Coordonnées GPS <span style="color:var(--muted);font-style:italic">— pour la météo automatique</span></label>
+        <div class="chantier-modal-grid2" style="margin-top:0">
+          <input type="number" id="cm-lat" placeholder="Latitude  ex. 50.4805" step="0.0001">
+          <input type="number" id="cm-lon" placeholder="Longitude ex. 4.8360" step="0.0001">
+        </div>
+        <button class="btn-gps-detect" onclick="detecterGPSPourModal()">📡 Détecter ma position GPS</button>
+        <div id="cm-gps-status" style="font-size:11px;color:var(--muted);margin-top:4px"></div>
+      </div>
+    </div>
+    <div class="chantier-modal-footer">
+      <button onclick="fermerModalNouveauChantier()" style="padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--muted);cursor:pointer">Annuler</button>
+      <button onclick="sauvegarderNouveauChantier()" style="padding:8px 18px;border:none;border-radius:6px;background:var(--blue2);color:#fff;font-weight:600;cursor:pointer">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <div class="jalon-modal-overlay" id="jalon-modal-overlay" onclick="if(event.target===this)fermerFicheJalon()">
   <div class="jalon-modal">
     <div class="jalon-modal-header">
@@ -4086,6 +4197,171 @@ function getUserCode() {
 function getUserName(code) {
   return (USERS[code] || USERS_BASE['JJ']).name;
 }
+
+// ═══════════════════════════════════════════════════════════════════
+//  GESTION CHANTIERS DYNAMIQUES
+// ═══════════════════════════════════════════════════════════════════
+const CUSTOM_CHANTIERS_KEY = 'wanty_chantiers_custom_v1';
+
+function loadCustomChantiers() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(CUSTOM_CHANTIERS_KEY) || '[]');
+    const dl = document.getElementById('chantier-datalist');
+    stored.forEach(c => {
+      CHANTIERS[c.num] = { client: c.client, nom: c.nom, adresse: c.adresse || '', lat: c.lat || 0, lon: c.lon || 0 };
+      if (dl && ![...dl.options].some(o => o.value.startsWith(c.num))) {
+        const opt = document.createElement('option');
+        opt.value = c.num + ' — ' + c.nom;
+        dl.appendChild(opt);
+      }
+    });
+  } catch(e) { console.warn('loadCustomChantiers:', e); }
+}
+
+function ouvrirModalNouveauChantier() {
+  ['cm-num','cm-nom','cm-adresse','cm-gps-status'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value !== undefined ? (el.value = '') : (el.textContent = '');
+  });
+  document.getElementById('cm-client').value = '';
+  document.getElementById('cm-client-autre').value = '';
+  document.getElementById('cm-lat').value = '';
+  document.getElementById('cm-lon').value = '';
+  document.getElementById('chantier-modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('cm-num')?.focus(), 100);
+}
+
+function fermerModalNouveauChantier() {
+  document.getElementById('chantier-modal-overlay').classList.remove('open');
+}
+
+function sauvegarderNouveauChantier() {
+  const num    = (document.getElementById('cm-num').value || '').trim();
+  const nom    = (document.getElementById('cm-nom').value || '').trim();
+  const sel    = document.getElementById('cm-client').value;
+  const autre  = (document.getElementById('cm-client-autre').value || '').trim();
+  const client = sel === 'Autre' ? autre : sel;
+  const adresse= (document.getElementById('cm-adresse').value || '').trim();
+  const lat    = parseFloat(document.getElementById('cm-lat').value) || 0;
+  const lon    = parseFloat(document.getElementById('cm-lon').value) || 0;
+
+  if (!num)    { alert('Le numéro Wanty est obligatoire.'); return; }
+  if (!nom)    { alert('Le nom du chantier est obligatoire.'); return; }
+  if (!client) { alert('Sélectionne ou indique le client.'); return; }
+  if (!/^\d{7,12}$/.test(num)) { alert('Le numéro Wanty doit contenir entre 7 et 12 chiffres (ex. 202508052).'); return; }
+  if (CHANTIERS[num]) { alert('Ce numéro existe déjà : ' + CHANTIERS[num].nom); return; }
+
+  // Ajouter en mémoire
+  CHANTIERS[num] = { client, nom, adresse, lat, lon };
+
+  // Ajouter au datalist
+  const dl = document.getElementById('chantier-datalist');
+  if (dl) {
+    const opt = document.createElement('option');
+    opt.value = num + ' — ' + nom;
+    dl.appendChild(opt);
+  }
+
+  // Persister dans localStorage
+  const stored = JSON.parse(localStorage.getItem(CUSTOM_CHANTIERS_KEY) || '[]');
+  stored.push({ num, nom, client, adresse, lat, lon });
+  localStorage.setItem(CUSTOM_CHANTIERS_KEY, JSON.stringify(stored));
+
+  // Sélectionner le nouveau chantier
+  const input = document.getElementById('f-chantier');
+  if (input) {
+    input.value = num + ' — ' + nom;
+    onChantierChange();
+  }
+
+  fermerModalNouveauChantier();
+  showToast('✓ Chantier ' + num + ' enregistré.');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  GPS — LOCALISATION AUTOMATIQUE
+// ═══════════════════════════════════════════════════════════════════
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function chantierLePlusProche(lat, lon) {
+  let best = null, bestDist = Infinity;
+  Object.entries(CHANTIERS).forEach(([key, info]) => {
+    if (!info.lat || !info.lon) return;
+    const d = haversineKm(lat, lon, info.lat, info.lon);
+    if (d < bestDist) { bestDist = d; best = { key, info, dist: d }; }
+  });
+  return best;
+}
+
+function detecterGPS() {
+  if (!navigator.geolocation) { showToast('GPS non disponible sur cet appareil.'); return; }
+  showToast('📡 Localisation en cours…');
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude: lat, longitude: lon } = pos.coords;
+      const proche = chantierLePlusProche(lat, lon);
+      if (proche) {
+        const distTxt = proche.dist < 1
+          ? Math.round(proche.dist * 1000) + ' m'
+          : proche.dist.toFixed(1) + ' km';
+        // Charger la météo du site le plus proche
+        fetchMeteo(proche.info.lat, proche.info.lon, proche.info.nom);
+        // Proposer de sélectionner ce chantier
+        const msg = 'Chantier le plus proche : ' + proche.key + ' — ' + proche.info.nom + '\nDistance : ' + distTxt + '\n\nSélectionner ce chantier ?';
+        if (confirm(msg)) {
+          const input = document.getElementById('f-chantier');
+          if (input) { input.value = proche.key + ' — ' + proche.info.nom; onChantierChange(); }
+        } else {
+          // Charger quand même la météo de la position réelle
+          fetchMeteo(lat, lon, 'Ma position GPS (' + lat.toFixed(4) + ', ' + lon.toFixed(4) + ')');
+        }
+      } else {
+        fetchMeteo(lat, lon, 'Position GPS (' + lat.toFixed(4) + ', ' + lon.toFixed(4) + ')');
+        showToast('📡 Météo chargée depuis votre position GPS.');
+      }
+    },
+    err => {
+      const msgs = { 1:'Accès GPS refusé.', 2:'Position GPS indisponible.', 3:'Timeout GPS.' };
+      showToast('⚠ ' + (msgs[err.code] || 'Erreur GPS.'));
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+  );
+}
+
+function detecterGPSPourModal() {
+  if (!navigator.geolocation) { document.getElementById('cm-gps-status').textContent = 'GPS non disponible.'; return; }
+  const status = document.getElementById('cm-gps-status');
+  status.textContent = '📡 Localisation…';
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const lat = pos.coords.latitude.toFixed(5);
+      const lon = pos.coords.longitude.toFixed(5);
+      document.getElementById('cm-lat').value = lat;
+      document.getElementById('cm-lon').value = lon;
+      status.textContent = '✓ Position détectée : ' + lat + ', ' + lon + ' (précision : ' + Math.round(pos.coords.accuracy) + ' m)';
+      // Auto-remplir adresse si vide
+      if (!document.getElementById('cm-adresse').value) {
+        fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lon + '&format=json')
+          .then(r => r.json())
+          .then(d => {
+            if (d.display_name) document.getElementById('cm-adresse').value = d.display_name.split(',').slice(0,3).join(',').trim();
+          }).catch(() => {});
+      }
+    },
+    err => {
+      const msgs = { 1:'GPS refusé.', 2:'Indisponible.', 3:'Timeout.' };
+      status.textContent = '⚠ ' + (msgs[err.code] || 'Erreur GPS.');
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+}
+
 function getChantierCode() {
   const el = document.getElementById('f-chantier');
   if (!el) return '';
@@ -4261,6 +4537,7 @@ loadPlanCells();
   initPlanningWeekSelector();
 renderHistory();
 initSignaturePad();
+loadCustomChantiers();
 initDefaultChantier();
 attachDraftListeners();
 renderDraftList();
