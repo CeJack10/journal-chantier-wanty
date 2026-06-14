@@ -1,4 +1,4 @@
-<!-- BUILD:v7 -->
+<!-- BUILD:v8 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -865,6 +865,7 @@
   <button class="tab-btn active" onclick="switchTab('journal',this)">📋 Journal</button>
   <button class="tab-btn" onclick="switchTab('planning',this)">📅 Planning Semaine</button>
   <button class="tab-btn" onclick="switchTab('synthese',this)">📊 Synthèse Globale</button>
+  <button class="tab-btn" onclick="switchTab('hommes',this)">👥 Planning Hommes</button>
 </div>
 
 <div id="tab-journal" class="tab-pane active">
@@ -1844,6 +1845,144 @@
 </div>
 </div>
 
+<!-- ════════════════════════════════════════════════════════════
+     TAB PLANNING HOMMES — Module V1 (StorageAdapter localStorage)
+     ════════════════════════════════════════════════════════════ -->
+
+<div id="tab-hommes" class="tab-pane">
+<div class="main">
+  <!-- Header -->
+  <div class="plan-header">
+    <div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:4px">PLANNING HOMMES</div>
+      <h2>Planning d'allocation — Équipe Rhisnes</h2>
+      <div class="meta" style="font-size:11px">Semaine de référence</div>
+    </div>
+    <div style="text-align:right">
+      <button class="btn-secondary" onclick="HommesModule.exportSnapshot()" style="margin-bottom:8px;width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;border-radius:4px">📥 Exporter planning</button>
+      <button class="btn-secondary" onclick="HommesModule.importSnapshot()" style="width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;border-radius:4px">📤 Importer planning</button>
+    </div>
+  </div>
+
+  <!-- Formulaire réservation -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">➕</span>
+      <h3>Nouvelle réservation</h3>
+    </div>
+    <div class="section-body" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <label style="display:block;font-size:11px;color:var(--muted);margin-bottom:4px">Homme</label>
+        <select id="hommes-worker-select" style="width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px">
+          <option value="">— Sélectionner —</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;color:var(--muted);margin-bottom:4px">Site/Chantier</label>
+        <input type="text" id="hommes-site-input" placeholder="Ex: W-002 CE Rhisnes" style="width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;color:var(--muted);margin-bottom:4px">Début (JJ/MM/AAAA)</label>
+        <input type="text" id="hommes-start-date" placeholder="01/06/2026" style="width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;color:var(--muted);margin-bottom:4px">Fin (JJ/MM/AAAA)</label>
+        <input type="text" id="hommes-end-date" placeholder="05/06/2026" style="width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px">
+      </div>
+      <div style="grid-column:1/-1">
+        <button onclick="HommesModule.submitReservation()" style="width:100%;padding:10px;background:var(--green);color:white;border:none;border-radius:4px;cursor:pointer;font-weight:500">✓ Réserver</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grille allocation -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">📊</span>
+      <h3>Grille d'allocation</h3>
+    </div>
+    <div class="section-body" style="overflow-x:auto;padding:12px">
+      <div id="hommes-week-grid" style="display:grid;grid-template-columns:150px repeat(7,1fr);gap:8px;min-width:100%;font-size:11px">
+        <!-- Rempli dynamiquement -->
+        <div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px">Homme</div>
+        <div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">LUN</div>
+        <div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">MAR</div>
+        <div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">MER</div>
+        <div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">JEU</div>
+        <div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">VEN</div>
+        <div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">SAM</div>
+        <div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">DIM</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historique -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">📝</span>
+      <h3>Historique des allocations</h3>
+    </div>
+    <div class="section-body" style="overflow-x:auto">
+      <table id="hommes-history-table" style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border)">
+            <th style="text-align:left;padding:8px">Homme</th>
+            <th style="text-align:left;padding:8px">Dates</th>
+            <th style="text-align:left;padding:8px">Statut</th>
+            <th style="text-align:left;padding:8px">Action/Créé par</th>
+            <th style="text-align:left;padding:8px">Horodatage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rempli dynamiquement -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Modale : Conflit détecté -->
+<div id="hommes-conflict-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.5)">
+    <h3 style="margin-top:0;color:var(--red)">⚠️ Conflit détecté</h3>
+    <p id="hommes-conflict-msg" style="color:var(--text);margin:12px 0">—</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
+      <button onclick="HommesModule.closeConflictModal()" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text)">❌ Annuler</button>
+      <button onclick="HommesModule.requestUnlock()" style="padding:10px;background:var(--orange);border:none;border-radius:4px;cursor:pointer;color:white;font-weight:500">🔓 Demander déblocage</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale : Déblocage (génération code) -->
+<div id="hommes-unlock-generate-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:400px">
+    <h3 style="margin-top:0;color:var(--amber)">🔑 Générer code de déblocage</h3>
+    <p style="color:var(--muted);font-size:11px;margin:12px 0">Cliquez pour générer un code 4 chiffres à communiquer au demandeur.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
+      <button onclick="HommesModule.closeUnlockModal()" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text)">❌ Fermer</button>
+      <button onclick="HommesModule.generateUnlockCode()" style="padding:10px;background:var(--green);border:none;border-radius:4px;cursor:pointer;color:white;font-weight:500">✓ Générer</button>
+    </div>
+    <div id="hommes-generated-code" style="display:none;margin-top:16px;padding:12px;background:var(--surface);border:2px solid var(--green);border-radius:4px;text-align:center">
+      <div style="font-size:10px;color:var(--muted)">Code généré :</div>
+      <div id="hommes-code-display" style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--green);margin:8px 0">—</div>
+      <div style="font-size:9px;color:var(--muted)">⏱ Valable pour cette session uniquement</div>
+    </div>
+  </div>
+</div>
+
+<!-- Modale : Déblocage (saisie code) -->
+<div id="hommes-unlock-verify-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:400px">
+    <h3 style="margin-top:0;color:var(--amber)">🔓 Saisir le code</h3>
+    <p style="color:var(--muted);font-size:11px;margin:12px 0">Entrez le code 4 chiffres communiqué par l'autre conducteur.</p>
+    <input type="text" id="hommes-code-input" maxlength="4" placeholder="1234" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px;font-family:var(--mono);font-size:16px;text-align:center;margin:12px 0">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
+      <button onclick="HommesModule.closeVerifyModal()" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text)">❌ Annuler</button>
+      <button onclick="HommesModule.verifyAndUnlock()" style="padding:10px;background:var(--green);border:none;border-radius:4px;cursor:pointer;color:white;font-weight:500">✓ Débloquer</button>
+    </div>
+  </div>
+</div>
 
 <div id="toast">✓ Journal enregistré</div>
 
@@ -4793,5 +4932,497 @@ if (!suiviData.length) addSuiviRow();
     document.getElementById('install-banner').style.display = 'none';
   });
   </script>
+
+<!-- ════════════════════════════════════════════════════════════
+     BLOC HOMMES — StorageAdapter + Module Planning Hommes V1
+     ════════════════════════════════════════════════════════════ -->
+<script>
+
+// ──────────────────────────────────────────────────────
+// STORAGEDAPTER — Couche localStorage (MVP)
+// ──────────────────────────────────────────────────────
+
+const StorageAdapter = {
+  WORKERS_KEY: 'wanty_workers',
+  ALLOCATIONS_KEY: 'wanty_allocations',
+  HISTORY_KEY: 'wanty_allocation_history',
+
+  // 1. Récupérer les hommes disponibles
+  fetchWorkers() {
+    const data = localStorage.getItem(this.WORKERS_KEY);
+    if (!data) return [];
+    try {
+      const workers = JSON.parse(data);
+      return Array.isArray(workers) ? workers : [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  // 2. Récupérer les allocations
+  fetchAllocations() {
+    const data = localStorage.getItem(this.ALLOCATIONS_KEY);
+    if (!data) return [];
+    try {
+      const allocs = JSON.parse(data);
+      return Array.isArray(allocs) ? allocs : [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  // 3. Sauvegarder une allocation (avec détection de conflit)
+  async saveAllocation(allocation) {
+    const allocs = this.fetchAllocations();
+
+    // Parseur de date simple
+    const parseDate = (str) => {
+      const parts = str.split('/');
+      return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+    };
+
+    // Vérifier les chevauchements
+    const start = parseDate(allocation.start_date);
+    const end = parseDate(allocation.end_date);
+
+    for (const existing of allocs) {
+      if (existing.worker_id !== allocation.worker_id) continue;
+      if (existing.status === 'cancelled' || existing.status === 'replaced') continue;
+
+      const existStart = parseDate(existing.start_date);
+      const existEnd = parseDate(existing.end_date);
+
+      // Chevauchement : !(end < existStart || start > existEnd)
+      if (!(end < existStart || start > existEnd)) {
+        return {
+          status: 'CONFLICT',
+          conflicting: existing
+        };
+      }
+    }
+
+    // Pas de conflit, créer l'allocation
+    const newAlloc = {
+      id: 'alloc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+      worker_id: allocation.worker_id,
+      worker_name: allocation.worker_name,
+      site: allocation.site,
+      start_date: allocation.start_date,
+      end_date: allocation.end_date,
+      status: 'reserved',
+      created_by: allocation.created_by || 'Inconnu',
+      created_at: new Date().toISOString()
+    };
+
+    allocs.push(newAlloc);
+    localStorage.setItem(this.ALLOCATIONS_KEY, JSON.stringify(allocs));
+
+    // Enregistrer dans l'historique
+    this.saveHistory({
+      action: 'allocation_created',
+      allocation_id: newAlloc.id,
+      worker_name: newAlloc.worker_name,
+      dates: `${newAlloc.start_date} → ${newAlloc.end_date}`,
+      status: 'reserved',
+      actor: newAlloc.created_by
+    });
+
+    return { status: 'OK', allocation: newAlloc };
+  },
+
+  // 4. Récupérer l'historique
+  fetchHistory() {
+    const data = localStorage.getItem(this.HISTORY_KEY);
+    if (!data) return [];
+    try {
+      const history = JSON.parse(data);
+      return Array.isArray(history) ? history : [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  // 5. Enregistrer une action dans l'historique
+  saveHistory(entry) {
+    const history = this.fetchHistory();
+    history.push({
+      ...entry,
+      timestamp: new Date().toISOString()
+    });
+    localStorage.setItem(this.HISTORY_KEY, JSON.stringify(history));
+  },
+
+  // 6. Exporter snapshot JSON
+  exportSnapshot() {
+    const snapshot = {
+      workers: this.fetchWorkers(),
+      allocations: this.fetchAllocations(),
+      allocation_history: this.fetchHistory()
+    };
+    return JSON.stringify(snapshot, null, 2);
+  },
+
+  // 7. Importer snapshot JSON
+  importSnapshot(jsonString) {
+    try {
+      const snapshot = JSON.parse(jsonString);
+      if (!Array.isArray(snapshot.workers) || !Array.isArray(snapshot.allocations) || !Array.isArray(snapshot.allocation_history)) {
+        return { status: 'ERROR', message: 'Format JSON invalide' };
+      }
+
+      // Déduplication sur id
+      const workers = snapshot.workers;
+      const existingAllocs = this.fetchAllocations();
+      const existingIds = new Set(existingAllocs.map(a => a.id));
+      const newAllocs = snapshot.allocations.filter(a => !existingIds.has(a.id));
+
+      localStorage.setItem(this.WORKERS_KEY, JSON.stringify(workers));
+      localStorage.setItem(this.ALLOCATIONS_KEY, JSON.stringify([...existingAllocs, ...newAllocs]));
+      localStorage.setItem(this.HISTORY_KEY, JSON.stringify(snapshot.allocation_history));
+
+      return { status: 'OK', added: newAllocs.length };
+    } catch (e) {
+      return { status: 'ERROR', message: e.message };
+    }
+  }
+};
+
+// ──────────────────────────────────────────────────────
+// DONNÉES DE TEST
+// ──────────────────────────────────────────────────────
+function initTestData() {
+  if (localStorage.getItem(StorageAdapter.WORKERS_KEY)) return;
+
+  const workers = [
+    { id: 'w1', name: 'Jean Dupont' },
+    { id: 'w2', name: 'Stéphane Lassaux' },
+    { id: 'w3', name: 'Paul Martin' }
+  ];
+
+  const allocations = [
+    {
+      id: 'alloc_test_1',
+      worker_id: 'w1',
+      worker_name: 'Jean Dupont',
+      site: 'W-002',
+      start_date: '16/06/2026',
+      end_date: '22/06/2026',
+      status: 'reserved',
+      created_by: 'Jean-Jacques',
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 'alloc_test_2',
+      worker_id: 'w1',
+      worker_name: 'Jean Dupont',
+      site: 'W-002',
+      start_date: '20/06/2026',
+      end_date: '26/06/2026',
+      status: 'reserved',
+      created_by: 'Stéphane',
+      created_at: new Date().toISOString()
+    }
+  ];
+
+  const history = [
+    {
+      action: 'allocation_created',
+      allocation_id: 'alloc_test_1',
+      worker_name: 'Jean Dupont',
+      dates: '16/06/2026 → 22/06/2026',
+      status: 'reserved',
+      actor: 'Jean-Jacques',
+      timestamp: new Date().toISOString()
+    },
+    {
+      action: 'allocation_created',
+      allocation_id: 'alloc_test_2',
+      worker_name: 'Jean Dupont',
+      dates: '20/06/2026 → 26/06/2026',
+      status: 'reserved',
+      actor: 'Stéphane',
+      timestamp: new Date().toISOString()
+    }
+  ];
+
+  localStorage.setItem(StorageAdapter.WORKERS_KEY, JSON.stringify(workers));
+  localStorage.setItem(StorageAdapter.ALLOCATIONS_KEY, JSON.stringify(allocations));
+  localStorage.setItem(StorageAdapter.HISTORY_KEY, JSON.stringify(history));
+
+  console.log('[BLOC HOMMES] Données de test initialisées');
+}
+
+// ──────────────────────────────────────────────────────
+// HOMMESMODULE — Logique du module
+// ──────────────────────────────────────────────────────
+
+const HommesModule = {
+  currentConflict: null,
+  currentAllocationForUnlock: null,
+  unlockedAllocation: null,
+
+  init() {
+    initTestData();
+    this.populateWorkerSelect();
+    this.renderGrid();
+    this.renderHistory();
+    console.log('[BLOC HOMMES] Module initialisé');
+  },
+
+  populateWorkerSelect() {
+    const workers = StorageAdapter.fetchWorkers();
+    const select = document.getElementById('hommes-worker-select');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">— Sélectionner —</option>';
+    workers.forEach(w => {
+      const opt = document.createElement('option');
+      opt.value = w.id;
+      opt.textContent = w.name;
+      select.appendChild(opt);
+    });
+  },
+
+  renderGrid() {
+    const grid = document.getElementById('hommes-week-grid');
+    if (!grid) return;
+
+    const workers = StorageAdapter.fetchWorkers();
+    const allocations = StorageAdapter.fetchAllocations();
+
+    // En-têtes déjà présents, on ajoute les lignes
+    let html = '<div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px">Homme</div>';
+    html += '<div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">LUN</div>';
+    html += '<div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">MAR</div>';
+    html += '<div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">MER</div>';
+    html += '<div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">JEU</div>';
+    html += '<div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">VEN</div>';
+    html += '<div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">SAM</div>';
+    html += '<div style="font-weight:600;padding:8px;background:var(--card);border-radius:4px;text-align:center">DIM</div>';
+
+    workers.forEach(worker => {
+      html += `<div style="font-weight:500;padding:8px;background:var(--surface);border-radius:4px">${worker.name}</div>`;
+
+      for (let day = 0; day < 7; day++) {
+        const hasAlloc = allocations.some(a =>
+          a.worker_id === worker.id &&
+          (a.status === 'reserved' || a.status === 'occupied')
+        );
+        const bgColor = hasAlloc ? 'var(--orange)' : 'var(--surface)';
+        html += `<div style="padding:8px;background:${bgColor};border-radius:4px;text-align:center;border:1px solid var(--border)">—</div>`;
+      }
+    });
+
+    grid.innerHTML = html;
+  },
+
+  renderHistory() {
+    const tbody = document.querySelector('#hommes-history-table tbody');
+    if (!tbody) return;
+
+    const history = StorageAdapter.fetchHistory();
+    const workers = StorageAdapter.fetchWorkers();
+
+    let html = '';
+    history.forEach(entry => {
+      const ts = new Date(entry.timestamp);
+      const timeStr = ts.toLocaleString('fr-FR');
+      html += `<tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:8px">${entry.worker_name || '—'}</td>
+        <td style="padding:8px">${entry.dates || '—'}</td>
+        <td style="padding:8px"><span style="background:var(--orange);color:white;padding:2px 6px;border-radius:3px;font-size:9px">${entry.status || '—'}</span></td>
+        <td style="padding:8px">${entry.action === 'allocation_created' ? '✓ Créée' : entry.action} par ${entry.actor}</td>
+        <td style="padding:8px;font-family:var(--mono);font-size:10px;color:var(--muted)">${timeStr}</td>
+      </tr>`;
+    });
+
+    tbody.innerHTML = html || '<tr><td colspan="5" style="padding:12px;text-align:center;color:var(--muted)">Aucun historique</td></tr>';
+  },
+
+  submitReservation() {
+    const workerId = document.getElementById('hommes-worker-select')?.value;
+    const site = document.getElementById('hommes-site-input')?.value;
+    const startDate = document.getElementById('hommes-start-date')?.value;
+    const endDate = document.getElementById('hommes-end-date')?.value;
+
+    if (!workerId || !site || !startDate || !endDate) {
+      alert('❌ Tous les champs sont obligatoires');
+      return;
+    }
+
+    const workers = StorageAdapter.fetchWorkers();
+    const worker = workers.find(w => w.id === workerId);
+    if (!worker) {
+      alert('❌ Homme non trouvé');
+      return;
+    }
+
+    const result = StorageAdapter.saveAllocation({
+      worker_id: workerId,
+      worker_name: worker.name,
+      site,
+      start_date: startDate,
+      end_date: endDate,
+      created_by: 'Jean-Jacques'
+    });
+
+    if (result.status === 'CONFLICT') {
+      this.currentConflict = result.conflicting;
+      document.getElementById('hommes-conflict-msg').textContent =
+        `${result.conflicting.worker_name} est déjà réservé du ${result.conflicting.start_date} au ${result.conflicting.end_date} (par ${result.conflicting.created_by}).`;
+      document.getElementById('hommes-conflict-modal').style.display = 'flex';
+    } else if (result.status === 'OK') {
+      alert('✓ Réservation créée');
+      document.getElementById('hommes-worker-select').value = '';
+      document.getElementById('hommes-site-input').value = '';
+      document.getElementById('hommes-start-date').value = '';
+      document.getElementById('hommes-end-date').value = '';
+      this.renderGrid();
+      this.renderHistory();
+    }
+  },
+
+  closeConflictModal() {
+    document.getElementById('hommes-conflict-modal').style.display = 'none';
+  },
+
+  requestUnlock() {
+    this.closeConflictModal();
+    document.getElementById('hommes-unlock-generate-modal').style.display = 'flex';
+    this.unlockedAllocation = this.currentConflict;
+  },
+
+  generateUnlockCode() {
+    const code = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+
+    // Hash SHA-256
+    const encoder = new TextEncoder();
+    const data = encoder.encode(code);
+    crypto.subtle.digest('SHA-256', data).then(hashBuffer => {
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      // Stocker le hash
+      sessionStorage.setItem('hommes_unlock_code_hash', hashHex);
+      sessionStorage.setItem('hommes_unlock_allocation_id', this.unlockedAllocation.id);
+
+      // Afficher le code
+      document.getElementById('hommes-generated-code').style.display = 'block';
+      document.getElementById('hommes-code-display').textContent = code;
+    });
+  },
+
+  closeUnlockModal() {
+    document.getElementById('hommes-unlock-generate-modal').style.display = 'none';
+    document.getElementById('hommes-generated-code').style.display = 'none';
+  },
+
+  closeVerifyModal() {
+    document.getElementById('hommes-unlock-verify-modal').style.display = 'none';
+    document.getElementById('hommes-code-input').value = '';
+  },
+
+  verifyAndUnlock() {
+    const enteredCode = document.getElementById('hommes-code-input')?.value;
+    const storedHash = sessionStorage.getItem('hommes_unlock_code_hash');
+    const allocId = sessionStorage.getItem('hommes_unlock_allocation_id');
+
+    if (!enteredCode || !storedHash) {
+      alert('❌ Code ou allocation manquants');
+      return;
+    }
+
+    const encoder = new TextEncoder();
+    const data = encoder.encode(enteredCode);
+    crypto.subtle.digest('SHA-256', data).then(hashBuffer => {
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const enteredHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      if (enteredHash !== storedHash) {
+        alert('❌ Code incorrect');
+        return;
+      }
+
+      // Code correct : marquer l'allocation comme remplacée
+      const allocs = StorageAdapter.fetchAllocations();
+      const idx = allocs.findIndex(a => a.id === allocId);
+      if (idx >= 0) {
+        allocs[idx].status = 'replaced';
+        localStorage.setItem(StorageAdapter.ALLOCATIONS_KEY, JSON.stringify(allocs));
+
+        StorageAdapter.saveHistory({
+          action: 'allocation_unlocked',
+          allocation_id: allocId,
+          worker_name: allocs[idx].worker_name,
+          dates: `${allocs[idx].start_date} → ${allocs[idx].end_date}`,
+          status: 'replaced',
+          actor: 'Déblocage'
+        });
+      }
+
+      alert('✓ Allocation débloquée et remplacée');
+      this.closeVerifyModal();
+      sessionStorage.removeItem('hommes_unlock_code_hash');
+      sessionStorage.removeItem('hommes_unlock_allocation_id');
+      this.renderGrid();
+      this.renderHistory();
+    });
+  },
+
+  exportSnapshot() {
+    const json = StorageAdapter.exportSnapshot();
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'planning-hommes-' + new Date().toISOString().split('T')[0] + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  },
+
+  importSnapshot() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = StorageAdapter.importSnapshot(event.target.result);
+        if (result.status === 'OK') {
+          alert(`✓ ${result.added} allocations importées`);
+          this.renderGrid();
+          this.renderHistory();
+        } else {
+          alert(`❌ ${result.message}`);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+};
+
+// Initialiser le module au chargement
+document.addEventListener('DOMContentLoaded', () => {
+  HommesModule.init();
+});
+
+// Décorateur sur switchTab pour fetch au clic sur Hommes
+const originalSwitchTab = window.switchTab;
+window.switchTab = function(name, btn) {
+  originalSwitchTab.call(this, name, btn);
+  if (name === 'hommes') {
+    HommesModule.renderGrid();
+    HommesModule.renderHistory();
+  }
+};
+
+console.log('[BLOC HOMMES] SDK localStorage chargé avec succès.');
+
+</script>
 </body>
 </html>
