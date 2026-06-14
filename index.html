@@ -3946,7 +3946,7 @@ function getTachesActivesPourSemaine(weekNum) {
 
   const res = { demarrent: [], enCours: [], terminent: [], actives: [] };
 
-  TACHES.forEach(t => {
+  getTaches().forEach(t => {
     if (t.isSummary) return;
     const isDone = done.includes(t.id) || parseDateFR(t.fin) < monday;
     if (isDone) return;
@@ -4163,7 +4163,7 @@ function refreshPlanningMeteo() {
   const iconEl = document.getElementById('plan-w-icon');
   const tempEl = document.getElementById('plan-w-temp');
   const descEl = document.getElementById('plan-w-desc');
-  if (!iconEl || !tempEl || !descEl) return;
+  if (!iconEl || !tempEl || !descEl || !info || !info.lat || !info.lon) return;
   descEl.textContent = 'Chargement…';
   fetch(`https://api.open-meteo.com/v1/forecast?latitude=${info.lat}&longitude=${info.lon}&current=temperature_2m,windspeed_10m,weathercode,precipitation&windspeed_unit=kmh&precipitation_unit=mm&timezone=Europe%2FBrussels`)
     .then(r => r.json())
