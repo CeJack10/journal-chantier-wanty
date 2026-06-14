@@ -1,4 +1,4 @@
-<!-- BUILD:v8 -->
+<!-- BUILD:v9 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -1855,8 +1855,8 @@
   <div class="plan-header">
     <div>
       <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:4px">PLANNING HOMMES</div>
-      <h2>Planning d'allocation — Équipe Rhisnes</h2>
-      <div class="meta" style="font-size:11px">Semaine de référence</div>
+      <h2 id="hommes-title" contenteditable="true" style="cursor:pointer;padding:4px;border-radius:4px;outline:none" onblur="HommesModule.saveTitle()" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}">Planning d'allocation — Équipe Rhisnes</h2>
+      <div class="meta" style="font-size:11px;color:var(--muted)">Cliquez pour éditer le titre</div>
     </div>
     <div style="text-align:right">
       <button class="btn-secondary" onclick="HommesModule.exportSnapshot()" style="margin-bottom:8px;width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;border-radius:4px">📥 Exporter planning</button>
@@ -5163,6 +5163,7 @@ const HommesModule = {
 
   init() {
     initTestData();
+    this.loadTitle();
     this.populateWorkerSelect();
     this.renderGrid();
     this.renderHistory();
@@ -5367,6 +5368,24 @@ const HommesModule = {
       this.renderGrid();
       this.renderHistory();
     });
+  },
+
+  loadTitle() {
+    const saved = localStorage.getItem('hommes_title');
+    if (saved) {
+      const titleEl = document.getElementById('hommes-title');
+      if (titleEl) titleEl.textContent = saved;
+    }
+  },
+
+  saveTitle() {
+    const titleEl = document.getElementById('hommes-title');
+    if (titleEl) {
+      const title = titleEl.textContent.trim();
+      if (title) {
+        localStorage.setItem('hommes_title', title);
+      }
+    }
   },
 
   exportSnapshot() {

@@ -1,6 +1,6 @@
 // Service Worker — Journal WANTY
 // Cache auto-invalidé par numéro de version — incrémenter à chaque déploiement
-const CACHE = 'journal-wanty-v9';
+const CACHE = 'journal-wanty-v10';
 
 const STATIC_ASSETS = [
   './manifest.json',
