@@ -1,4 +1,4 @@
-<!-- BUILD:v10 -->
+<!-- BUILD:v11 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -811,6 +811,17 @@
     cursor:pointer; white-space:nowrap; align-self:flex-start; margin-top:4px;
   }
   .btn-gps-banner:hover { border-color:var(--blue2); color:var(--blue2); }
+
+  /* Autocomplétion hommes */
+  #hommes-suggestions {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .hommes-suggestion-item {
+    padding:8px 12px; cursor:pointer; border-bottom:1px solid var(--border);
+    font-size:13px; color:var(--text);
+  }
+  .hommes-suggestion-item:last-child { border-bottom:none; }
+  .hommes-suggestion-item:hover { background:var(--card); }
 
 </style>
 </head>
@@ -1871,11 +1882,11 @@
       <h3>Nouvelle réservation</h3>
     </div>
     <div class="section-body" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div>
+      <div style="position:relative">
         <label style="display:block;font-size:11px;color:var(--muted);margin-bottom:4px">Homme</label>
-        <select id="hommes-worker-select" style="width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px">
-          <option value="">— Sélectionner —</option>
-        </select>
+        <input type="text" id="hommes-worker-input" placeholder="Taper nom..." style="width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px">
+        <div id="hommes-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;max-height:200px;overflow-y:auto;z-index:10;margin-top:-4px">
+        </div>
       </div>
       <div>
         <label style="display:block;font-size:11px;color:var(--muted);margin-bottom:4px">Site/Chantier</label>
@@ -5171,17 +5182,45 @@ const HommesModule = {
   },
 
   populateWorkerSelect() {
-    const workers = StorageAdapter.fetchWorkers();
-    const select = document.getElementById('hommes-worker-select');
-    if (!select) return;
+    const input = document.getElementById('hommes-worker-input');
+    if (!input) return;
 
-    select.innerHTML = '<option value="">— Sélectionner —</option>';
-    workers.forEach(w => {
-      const opt = document.createElement('option');
-      opt.value = w.id;
-      opt.textContent = w.name;
-      select.appendChild(opt);
+    input.oninput = () => HommesModule.filterWorkerSuggestions();
+  },
+
+  filterWorkerSuggestions() {
+    const input = document.getElementById('hommes-worker-input');
+    const suggestionsDiv = document.getElementById('hommes-suggestions');
+    const query = input.value.toLowerCase().trim();
+
+    if (!query) {
+      suggestionsDiv.style.display = 'none';
+      input.dataset.workerId = '';
+      return;
+    }
+
+    const workers = StorageAdapter.fetchWorkers();
+    const filtered = workers.filter(w => w.name.toLowerCase().includes(query));
+
+    if (filtered.length === 0) {
+      suggestionsDiv.style.display = 'none';
+      input.dataset.workerId = '';
+      return;
+    }
+
+    suggestionsDiv.innerHTML = '';
+    filtered.forEach(w => {
+      const item = document.createElement('div');
+      item.className = 'hommes-suggestion-item';
+      item.textContent = w.name;
+      item.onclick = () => {
+        input.value = w.name;
+        input.dataset.workerId = w.id;
+        suggestionsDiv.style.display = 'none';
+      };
+      suggestionsDiv.appendChild(item);
     });
+    suggestionsDiv.style.display = 'block';
   },
 
   renderGrid() {
@@ -5251,7 +5290,7 @@ const HommesModule = {
   },
 
   submitReservation() {
-    const workerId = document.getElementById('hommes-worker-select')?.value;
+    const workerId = document.getElementById('hommes-worker-input')?.dataset.workerId;
     const site = document.getElementById('hommes-site-input')?.value;
     const startDate = document.getElementById('hommes-start-date')?.value;
     const endDate = document.getElementById('hommes-end-date')?.value;
@@ -5284,10 +5323,13 @@ const HommesModule = {
       document.getElementById('hommes-conflict-modal').style.display = 'flex';
     } else if (result.status === 'OK') {
       alert('✓ Réservation créée');
-      document.getElementById('hommes-worker-select').value = '';
+      const input = document.getElementById('hommes-worker-input');
+      input.value = '';
+      input.dataset.workerId = '';
       document.getElementById('hommes-site-input').value = '';
       document.getElementById('hommes-start-date').value = '';
       document.getElementById('hommes-end-date').value = '';
+      document.getElementById('hommes-suggestions').style.display = 'none';
       this.renderGrid();
       this.renderHistory();
     }
