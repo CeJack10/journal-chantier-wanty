@@ -5241,7 +5241,7 @@ function initTestData() {
       id: 'alloc_test_1',
       worker_id: 'w1',
       worker_name: 'Jean Dupont',
-      site: 'W-002',
+      site: '202606001',
       start_date: '16/06/2026',
       end_date: '22/06/2026',
       status: 'reserved',
@@ -5252,7 +5252,7 @@ function initTestData() {
       id: 'alloc_test_2',
       worker_id: 'w1',
       worker_name: 'Jean Dupont',
-      site: 'W-002',
+      site: '202606002',
       start_date: '20/06/2026',
       end_date: '26/06/2026',
       status: 'reserved',
@@ -5379,6 +5379,26 @@ const HommesModule = {
     suggestionsDiv.style.display = suggestionsDiv.children.length > 0 ? 'block' : 'none';
   },
 
+  generateChantierCode(alloc) {
+    // Extrait année/mois de start_date (format DD/MM/YYYY ou YYYY-MM-DD)
+    let year, month;
+    if (alloc.start_date.includes('/')) {
+      // Format DD/MM/YYYY
+      const [day, m, y] = alloc.start_date.split('/');
+      year = y;
+      month = m;
+    } else {
+      // Format YYYY-MM-DD
+      const [y, m, day] = alloc.start_date.split('-');
+      year = y;
+      month = m;
+    }
+    // Cherche 3 chiffres consécutifs dans l'ID ou ajoute 001
+    const idMatch = alloc.id.match(/(\d{3})/);
+    const seqNum = idMatch ? idMatch[1] : '001';
+    return `${year}${month}${seqNum}`;
+  },
+
   renderGrid() {
     const grid = document.getElementById('hommes-week-grid');
     if (!grid) return;
@@ -5432,8 +5452,8 @@ const HommesModule = {
 
         const dayNum = cellDate.getDate();
         const month = String(cellDate.getMonth() + 1).padStart(2, '0');
-        const cellContent = `${dayLabels[day]} ${dayNum}/${month}`;
-        const bgColor = !alloc ? '#e0e7ff' : alloc.status === 'reserved' ? 'var(--orange)' : alloc.status === 'occupied' ? 'var(--red)' : '#e0e7ff';
+        const cellContent = alloc ? (alloc.site || this.generateChantierCode(alloc)) : '';
+        const bgColor = !alloc ? '#ffffff' : alloc.status === 'reserved' ? 'var(--orange)' : alloc.status === 'occupied' ? 'var(--red)' : '#e0e7ff';
 
         html += `<div style="padding:8px;background:${bgColor};border-radius:4px;text-align:center;border:1px solid var(--border);font-size:12px;font-weight:500">${cellContent}</div>`;
       }
