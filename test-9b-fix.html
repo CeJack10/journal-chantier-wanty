@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Test 9B-fix</title>
+<script>
+window.onload = function() {
+  setTimeout(function() {
+    // Chercher et cliquer sur le bouton Hommes
+    var buttons = document.querySelectorAll('button');
+    for (var i = 0; i < buttons.length; i++) {
+      if (buttons[i].textContent.includes('👥') && buttons[i].textContent.includes('Hommes')) {
+        console.log('>>> CLIC SUR HOMMES <<<');
+        buttons[i].click();
+        
+        // Attendre un peu que le fetch se termine
+        setTimeout(function() {
+          // Vérifier la grille
+          var gridContent = document.getElementById('hommes-week-grid');
+          if (gridContent) {
+            console.log('>>> GRILLE CONTENU <<<');
+            console.log(gridContent.innerHTML);
+          }
+          
+          // Vérifier l'historique
+          var historyContent = document.querySelector('#hommes-history-table tbody');
+          if (historyContent) {
+            console.log('>>> HISTORIQUE CONTENU <<<');
+            console.log(historyContent.innerHTML);
+          }
+        }, 2000);
+        
+        break;
+      }
+    }
+  }, 500);
+};
+</script>
+</head>
+<body>
+</body>
+</html>
