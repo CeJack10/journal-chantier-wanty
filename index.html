@@ -5442,12 +5442,25 @@ const HommesModule = {
         const cellDateStr = cellDate.toISOString().split('T')[0]; // Format YYYY-MM-DD
 
         // Vérifier SI une allocation couvre cette date EXACTE
+        const parseDate = (str) => {
+          if (!str) return null;
+          // Gère DD/MM/YYYY ou YYYY-MM-DD
+          if (str.includes('/')) {
+            const parts = str.split('/');
+            return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+          } else {
+            const parts = str.split('-');
+            return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+          }
+        };
+
         const alloc = allocations.find(a => {
           if (a.worker_id !== worker.id) return false;
           if (a.status !== 'reserved' && a.status !== 'occupied') return false;
 
-          const startDate = new Date(a.start_date);
-          const endDate = new Date(a.end_date);
+          const startDate = parseDate(a.start_date);
+          const endDate = parseDate(a.end_date);
+          if (!startDate || !endDate) return false;
           startDate.setHours(0, 0, 0, 0);
           endDate.setHours(0, 0, 0, 0);
 
