@@ -1,4 +1,4 @@
-<!-- BUILD:v13 -->
+<!-- BUILD:v14 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5180,6 +5180,15 @@ const StorageAdapter = {
     localStorage.setItem(this.HISTORY_KEY, JSON.stringify(history));
   },
 
+  // 5b. Sauvegarder un nouvel homme (ajout via autocomplétion)
+  saveWorker(worker) {
+    const workers = this.fetchWorkers();
+    const exists = workers.find(w => w.id === worker.id);
+    if (exists) return; // Ne pas dupliquer
+    workers.push(worker);
+    localStorage.setItem(this.WORKERS_KEY, JSON.stringify(workers));
+  },
+
   // 6. Exporter snapshot JSON
   exportSnapshot() {
     const snapshot = {
@@ -5699,7 +5708,7 @@ const HommesModule = {
     };
 
     const updated = [...workers, newWorker];
-    localStorage.setItem('hommes_workers', JSON.stringify(updated));
+    localStorage.setItem(StorageAdapter.WORKERS_KEY, JSON.stringify(updated));
     input.value = '';
     this.renderWorkersList();
     this.populateWorkerSelect();
@@ -5745,7 +5754,7 @@ const HommesModule = {
     }
 
     worker.name = newName;
-    localStorage.setItem('hommes_workers', JSON.stringify(workers));
+    localStorage.setItem(StorageAdapter.WORKERS_KEY, JSON.stringify(workers));
     this.closeEditModal();
     this.renderWorkersList();
     this.populateWorkerSelect();
@@ -5771,7 +5780,7 @@ const HommesModule = {
   confirmDelete() {
     const workers = StorageAdapter.fetchWorkers();
     const filtered = workers.filter(w => w.id !== this.currentDeletingWorkerId);
-    localStorage.setItem('hommes_workers', JSON.stringify(filtered));
+    localStorage.setItem(StorageAdapter.WORKERS_KEY, JSON.stringify(filtered));
     this.closeDeleteModal();
     this.renderWorkersList();
     this.populateWorkerSelect();
