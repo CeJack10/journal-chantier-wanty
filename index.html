@@ -1,4 +1,4 @@
-<!-- BUILD:v12 -->
+<!-- BUILD:v13 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -1949,6 +1949,48 @@
       </div>
       <div style="grid-column:1/-1">
         <button onclick="HommesModule.submitReservation()" style="width:100%;padding:10px;background:var(--green);color:white;border:none;border-radius:4px;cursor:pointer;font-weight:500">✓ Réserver</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gestion des hommes -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">👥</span>
+      <h3>Gestion des hommes</h3>
+    </div>
+    <div class="section-body" style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-bottom:16px">
+      <div>
+        <label style="display:block;font-size:11px;color:var(--muted);margin-bottom:4px">Ajouter un homme</label>
+        <input type="text" id="hommes-add-input" placeholder="Ex: Jean Dupont" style="width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px" onkeydown="if(event.key==='Enter'){HommesModule.addWorker()}">
+      </div>
+      <button onclick="HommesModule.addWorker()" style="padding:8px 12px;background:var(--green);color:white;border:none;border-radius:4px;cursor:pointer;font-weight:500">➕ Ajouter</button>
+    </div>
+    <div id="hommes-list" style="display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))">
+      <!-- Rempli dynamiquement -->
+    </div>
+  </div>
+
+  <!-- Modale : Édition homme -->
+  <div id="hommes-edit-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:300px">
+      <h3 style="margin-top:0">✏️ Éditer homme</h3>
+      <input type="text" id="hommes-edit-input" placeholder="Nom" style="width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px;margin-bottom:16px" onkeydown="if(event.key==='Enter'){HommesModule.saveWorkerEdit()}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button onclick="HommesModule.closeEditModal()" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text)">❌ Annuler</button>
+        <button onclick="HommesModule.saveWorkerEdit()" style="padding:10px;background:var(--green);border:none;border-radius:4px;cursor:pointer;color:white;font-weight:500">✓ Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale : Confirmation suppression -->
+  <div id="hommes-delete-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:300px">
+      <h3 style="margin-top:0;color:var(--red)">⚠️ Supprimer <span id="hommes-delete-name"></span> ?</h3>
+      <p style="color:var(--muted);font-size:11px;margin:12px 0">Cette action est définitive.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button onclick="HommesModule.closeDeleteModal()" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text)">❌ Annuler</button>
+        <button onclick="HommesModule.confirmDelete()" style="padding:10px;background:var(--red);border:none;border-radius:4px;cursor:pointer;color:white;font-weight:500">🗑 Supprimer</button>
       </div>
     </div>
   </div>
@@ -5251,6 +5293,7 @@ const HommesModule = {
     initTestData();
     this.loadTitle();
     this.populateWorkerSelect();
+    this.renderWorkersList();
     this.renderGrid();
     this.renderHistory();
     console.log('[BLOC HOMMES] Module initialisé');
@@ -5276,26 +5319,55 @@ const HommesModule = {
 
     const workers = StorageAdapter.fetchWorkers();
     const filtered = workers.filter(w => w.name.toLowerCase().includes(query));
-
-    if (filtered.length === 0) {
-      suggestionsDiv.style.display = 'none';
-      input.dataset.workerId = '';
-      return;
-    }
+    const exactMatch = workers.find(w => w.name.toLowerCase() === query);
 
     suggestionsDiv.innerHTML = '';
-    filtered.forEach(w => {
+
+    // Si match exact : afficher "Nom ✓"
+    if (exactMatch) {
       const item = document.createElement('div');
       item.className = 'hommes-suggestion-item';
-      item.textContent = w.name;
+      item.innerHTML = `${exactMatch.name} <span style="color:green;font-weight:bold">✓</span>`;
       item.onclick = () => {
-        input.value = w.name;
-        input.dataset.workerId = w.id;
+        input.value = exactMatch.name;
+        input.dataset.workerId = exactMatch.id;
         suggestionsDiv.style.display = 'none';
       };
       suggestionsDiv.appendChild(item);
+    }
+
+    // Ajouter suggestions existantes filtrées
+    filtered.forEach(w => {
+      if (w.id !== exactMatch?.id) {
+        const item = document.createElement('div');
+        item.className = 'hommes-suggestion-item';
+        item.textContent = w.name;
+        item.onclick = () => {
+          input.value = w.name;
+          input.dataset.workerId = w.id;
+          suggestionsDiv.style.display = 'none';
+        };
+        suggestionsDiv.appendChild(item);
+      }
     });
-    suggestionsDiv.style.display = 'block';
+
+    // Si pas de match exact : proposer "+ Ajouter 'Nom' à l'équipe"
+    if (!exactMatch) {
+      const addItem = document.createElement('div');
+      addItem.className = 'hommes-suggestion-item';
+      addItem.style.cssText = 'color:var(--primary);font-weight:600;cursor:pointer';
+      addItem.innerHTML = `+ Ajouter '<strong>${query}</strong>' à l'équipe`;
+      addItem.onclick = () => {
+        const newId = 'worker_' + Date.now();
+        StorageAdapter.saveWorker({ id: newId, name: query });
+        input.value = query;
+        input.dataset.workerId = newId;
+        suggestionsDiv.style.display = 'none';
+      };
+      suggestionsDiv.appendChild(addItem);
+    }
+
+    suggestionsDiv.style.display = suggestionsDiv.children.length > 0 ? 'block' : 'none';
   },
 
   renderGrid() {
@@ -5580,6 +5652,130 @@ const HommesModule = {
     } else {
       alert(`❌ ${result.message}`);
     }
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // Gestion des hommes (ajout/édition/suppression)
+  // ════════════════════════════════════════════════════════════
+
+  renderWorkersList() {
+    const container = document.getElementById('hommes-list');
+    if (!container) return;
+
+    const workers = StorageAdapter.fetchWorkers();
+    if (workers.length === 0) {
+      container.innerHTML = '<div style="grid-column:1/-1;padding:12px;text-align:center;color:var(--muted);font-size:11px">Aucun homme ajouté. Commencez par en ajouter un.</div>';
+      return;
+    }
+
+    container.innerHTML = workers.map(w => `
+      <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:4px">
+        <div style="font-weight:500;color:var(--text)">${w.name}</div>
+        <button onclick="HommesModule.openEditModal('${w.id}', '${w.name.replace(/'/g, "\\'")}')" style="padding:6px 8px;background:var(--amber);color:white;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:500">✏️ Éditer</button>
+        <button onclick="HommesModule.openDeleteModal('${w.id}', '${w.name.replace(/'/g, "\\'")}')" style="padding:6px 8px;background:var(--red);color:white;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:500">🗑 Supprimer</button>
+      </div>
+    `).join('');
+  },
+
+  addWorker() {
+    const input = document.getElementById('hommes-add-input');
+    const name = input.value.trim();
+
+    if (!name) {
+      alert('⚠️ Entrez un nom');
+      return;
+    }
+
+    const workers = StorageAdapter.fetchWorkers();
+    if (workers.some(w => w.name.toLowerCase() === name.toLowerCase())) {
+      alert('⚠️ Cet homme existe déjà');
+      input.value = '';
+      return;
+    }
+
+    const newWorker = {
+      id: 'worker_' + Date.now(),
+      name: name
+    };
+
+    const updated = [...workers, newWorker];
+    localStorage.setItem('hommes_workers', JSON.stringify(updated));
+    input.value = '';
+    this.renderWorkersList();
+    this.populateWorkerSelect();
+    this.renderGrid();
+  },
+
+  currentEditingWorkerId: null,
+
+  openEditModal(workerId, workerName) {
+    this.currentEditingWorkerId = workerId;
+    const input = document.getElementById('hommes-edit-input');
+    input.value = workerName;
+    input.focus();
+    document.getElementById('hommes-edit-modal').style.display = 'flex';
+    input.select();
+  },
+
+  closeEditModal() {
+    document.getElementById('hommes-edit-modal').style.display = 'none';
+    this.currentEditingWorkerId = null;
+  },
+
+  saveWorkerEdit() {
+    const input = document.getElementById('hommes-edit-input');
+    const newName = input.value.trim();
+
+    if (!newName) {
+      alert('⚠️ Le nom ne peut pas être vide');
+      return;
+    }
+
+    const workers = StorageAdapter.fetchWorkers();
+    const worker = workers.find(w => w.id === this.currentEditingWorkerId);
+    if (!worker) {
+      alert('❌ Homme introuvable');
+      this.closeEditModal();
+      return;
+    }
+
+    if (workers.some(w => w.id !== this.currentEditingWorkerId && w.name.toLowerCase() === newName.toLowerCase())) {
+      alert('⚠️ Un homme avec ce nom existe déjà');
+      return;
+    }
+
+    worker.name = newName;
+    localStorage.setItem('hommes_workers', JSON.stringify(workers));
+    this.closeEditModal();
+    this.renderWorkersList();
+    this.populateWorkerSelect();
+    this.renderGrid();
+  },
+
+  currentDeletingWorkerId: null,
+  currentDeletingWorkerName: null,
+
+  openDeleteModal(workerId, workerName) {
+    this.currentDeletingWorkerId = workerId;
+    this.currentDeletingWorkerName = workerName;
+    document.getElementById('hommes-delete-name').textContent = workerName;
+    document.getElementById('hommes-delete-modal').style.display = 'flex';
+  },
+
+  closeDeleteModal() {
+    document.getElementById('hommes-delete-modal').style.display = 'none';
+    this.currentDeletingWorkerId = null;
+    this.currentDeletingWorkerName = null;
+  },
+
+  confirmDelete() {
+    const workers = StorageAdapter.fetchWorkers();
+    const filtered = workers.filter(w => w.id !== this.currentDeletingWorkerId);
+    localStorage.setItem('hommes_workers', JSON.stringify(filtered));
+    this.closeDeleteModal();
+    this.renderWorkersList();
+    this.populateWorkerSelect();
+    this.renderGrid();
   }
 };
 
@@ -5593,6 +5789,7 @@ const originalSwitchTab = window.switchTab;
 window.switchTab = function(name, btn) {
   originalSwitchTab.call(this, name, btn);
   if (name === 'hommes') {
+    HommesModule.renderWorkersList();
     HommesModule.renderGrid();
     HommesModule.renderHistory();
   }
