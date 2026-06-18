@@ -1,4 +1,4 @@
-<!-- BUILD:v9 -->
+<!-- BUILD:v10 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5109,7 +5109,7 @@ function initTestData() {
       end_date: '22/06/2026',
       status: 'reserved',
       created_by: 'Jean-Jacques',
-      created_at: new Date().toISOString()
+      created_at: '2026-06-18T10:00:00Z'
     },
     {
       id: 'alloc_test_2',
@@ -5120,7 +5120,7 @@ function initTestData() {
       end_date: '26/06/2026',
       status: 'reserved',
       created_by: 'Stéphane',
-      created_at: new Date().toISOString()
+      created_at: '2026-06-18T11:00:00Z'
     }
   ];
 
@@ -5132,7 +5132,7 @@ function initTestData() {
       dates: '16/06/2026 → 22/06/2026',
       status: 'reserved',
       actor: 'Jean-Jacques',
-      timestamp: new Date().toISOString()
+      timestamp: '2026-06-18T10:00:00Z'
     },
     {
       action: 'allocation_created',
@@ -5141,7 +5141,7 @@ function initTestData() {
       dates: '20/06/2026 → 26/06/2026',
       status: 'reserved',
       actor: 'Stéphane',
-      timestamp: new Date().toISOString()
+      timestamp: '2026-06-18T11:00:00Z'
     }
   ];
 
@@ -5205,12 +5205,10 @@ const HommesModule = {
       html += `<div style="font-weight:500;padding:8px;background:var(--surface);border-radius:4px">${worker.name}</div>`;
 
       for (let day = 0; day < 7; day++) {
-        const hasAlloc = allocations.some(a =>
-          a.worker_id === worker.id &&
-          (a.status === 'reserved' || a.status === 'occupied')
-        );
-        const bgColor = hasAlloc ? 'var(--orange)' : 'var(--surface)';
-        html += `<div style="padding:8px;background:${bgColor};border-radius:4px;text-align:center;border:1px solid var(--border)">—</div>`;
+        const alloc = allocations.find(a => a.worker_id === worker.id && (a.status === 'reserved' || a.status === 'occupied'));
+        const cellContent = !alloc ? '—' : `${worker.name.split(' ')[0]}-${day+1}`;
+        const bgColor = !alloc ? '#e0e7ff' : alloc.status === 'reserved' ? 'var(--orange)' : alloc.status === 'occupied' ? 'var(--red)' : '#e0e7ff';
+        html += `<div style="padding:8px;background:${bgColor};border-radius:4px;text-align:center;border:1px solid var(--border);font-size:12px;font-weight:500">${cellContent}</div>`;
       }
     });
 
@@ -5222,20 +5220,32 @@ const HommesModule = {
     if (!tbody) return;
 
     const history = StorageAdapter.fetchHistory();
-    const workers = StorageAdapter.fetchWorkers();
+    const actionLabels = {
+      'allocation_created': '✓ Créée',
+      'allocation_unlocked': '🔓 Débloquée'
+    };
 
-    let html = '';
-    history.forEach(entry => {
+    const html = history.map(entry => {
       const ts = new Date(entry.timestamp);
-      const timeStr = ts.toLocaleString('fr-FR');
-      html += `<tr style="border-bottom:1px solid var(--border)">
+      const day = String(ts.getDate()).padStart(2, '0');
+      const months = ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
+      const month = months[ts.getMonth()];
+      const year = ts.getFullYear();
+      const hours = String(ts.getHours()).padStart(2, '0');
+      const mins = String(ts.getMinutes()).padStart(2, '0');
+      const secs = String(ts.getSeconds()).padStart(2, '0');
+      const timeStr = `${day} ${month} ${year} ${hours}:${mins}:${secs}`;
+
+      const actionLabel = actionLabels[entry.action] || entry.action;
+
+      return `<tr style="border-bottom:1px solid var(--border)">
         <td style="padding:8px">${entry.worker_name || '—'}</td>
         <td style="padding:8px">${entry.dates || '—'}</td>
         <td style="padding:8px"><span style="background:var(--orange);color:white;padding:2px 6px;border-radius:3px;font-size:9px">${entry.status || '—'}</span></td>
-        <td style="padding:8px">${entry.action === 'allocation_created' ? '✓ Créée' : entry.action} par ${entry.actor}</td>
+        <td style="padding:8px">${actionLabel} par ${entry.actor || '—'}</td>
         <td style="padding:8px;font-family:var(--mono);font-size:10px;color:var(--muted)">${timeStr}</td>
       </tr>`;
-    });
+    }).join('');
 
     tbody.innerHTML = html || '<tr><td colspan="5" style="padding:12px;text-align:center;color:var(--muted)">Aucun historique</td></tr>';
   },
