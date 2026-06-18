@@ -2059,7 +2059,7 @@
   <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:400px">
     <h3 style="margin-top:0;color:var(--amber)">🔑 Générer code de déblocage</h3>
     <p style="color:var(--muted);font-size:11px;margin:12px 0">Cliquez pour générer un code 4 chiffres à communiquer au demandeur.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
+    <div id="hommes-unlock-buttons-before" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
       <button onclick="HommesModule.closeUnlockModal()" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text)">❌ Fermer</button>
       <button onclick="HommesModule.generateUnlockCode()" style="padding:10px;background:var(--green);border:none;border-radius:4px;cursor:pointer;color:white;font-weight:500">✓ Générer</button>
     </div>
@@ -2067,6 +2067,10 @@
       <div style="font-size:10px;color:var(--muted)">Code généré :</div>
       <div id="hommes-code-display" style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--green);margin:8px 0">—</div>
       <div style="font-size:9px;color:var(--muted)">⏱ Valable pour cette session uniquement</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+        <button onclick="HommesModule.copyCodeToClipboard()" style="padding:10px;background:var(--blue);border:none;border-radius:4px;cursor:pointer;color:white;font-weight:500">📋 Copier</button>
+        <button onclick="HommesModule.goToVerifyModal()" style="padding:10px;background:var(--green);border:none;border-radius:4px;cursor:pointer;color:white;font-weight:500">→ Saisir</button>
+      </div>
     </div>
   </div>
 </div>
@@ -5581,6 +5585,22 @@ const HommesModule = {
   closeVerifyModal() {
     document.getElementById('hommes-unlock-verify-modal').style.display = 'none';
     document.getElementById('hommes-code-input').value = '';
+  },
+
+  copyCodeToClipboard() {
+    const code = document.getElementById('hommes-code-display').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = event.target;
+      const oldText = btn.textContent;
+      btn.textContent = '✓ Copié !';
+      setTimeout(() => { btn.textContent = oldText; }, 1500);
+    });
+  },
+
+  goToVerifyModal() {
+    document.getElementById('hommes-unlock-generate-modal').style.display = 'none';
+    document.getElementById('hommes-unlock-verify-modal').style.display = 'flex';
+    document.getElementById('hommes-code-input').focus();
   },
 
   verifyAndUnlock() {
