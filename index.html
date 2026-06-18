@@ -5445,7 +5445,7 @@ const HommesModule = {
     tbody.innerHTML = html || '<tr><td colspan="5" style="padding:12px;text-align:center;color:var(--muted)">Aucun historique</td></tr>';
   },
 
-  submitReservation() {
+  async submitReservation() {
     const workerId = document.getElementById('hommes-worker-input')?.dataset.workerId;
     const site = document.getElementById('hommes-site-input')?.value;
     const startDate = document.getElementById('hommes-start-date')?.value;
@@ -5463,7 +5463,7 @@ const HommesModule = {
       return;
     }
 
-    const result = StorageAdapter.saveAllocation({
+    const result = await StorageAdapter.saveAllocation({
       worker_id: workerId,
       worker_name: worker.name,
       site,
