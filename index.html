@@ -1,4 +1,4 @@
-<!-- BUILD:v15 -->
+<!-- BUILD:v16 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5107,10 +5107,16 @@ const StorageAdapter = {
   async saveAllocation(allocation) {
     const allocs = this.fetchAllocations();
 
-    // Parseur de date simple
+    // Parseur de date robuste (DD/MM/YYYY ou YYYY-MM-DD)
     const parseDate = (str) => {
-      const parts = str.split('/');
-      return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      if (!str) return null;
+      if (str.includes('/')) {
+        const parts = str.split('/');
+        return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      } else {
+        const parts = str.split('-');
+        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      }
     };
 
     // Vérifier les chevauchements
