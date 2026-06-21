@@ -1,4 +1,4 @@
-<!-- BUILD:v21 -->
+<!-- BUILD:v22 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -136,8 +136,8 @@
     color: var(--navy);
   }
   [data-theme="light"] .jalons-table th {
-    background: #1e5fa8;
-    color: #fff;
+    background: #dde6f0;
+    color: #1e3a5f;
   }
   [data-theme="light"] .jalons-table td {
     border-color: var(--border);
@@ -166,12 +166,13 @@
     color: var(--text);
   }
   [data-theme="light"] .plan-cell.empty {
-    background: #e8eef5;
+    background: #f8fafc;
     color: var(--muted);
   }
   [data-theme="light"] .plan-cell.sec-label {
-    background: #1a2744;
-    color: #93c5fd;
+    background: #e8f0fe;
+    color: #1e3a5f;
+    border-left: 3px solid #2e75b6;
   }
 
   /* Cellules colorées planning : couleurs plus saturées pour fond clair */
@@ -256,6 +257,64 @@
     background: #f0f5fa !important;
     color: var(--text) !important;
   }
+
+  /* ── Mode Jour : jalons & planning — corrections inline background:var(--navy) ── */
+
+  /* Cellule semaine (input n° semaine) */
+  [data-theme="light"] #plan-semaine-input {
+    background: #e8f0fe !important;
+    border-color: #2e75b6 !important;
+    color: #1e3a5f !important;
+  }
+
+  /* Selects filtre responsable / statut dans la barre jalons */
+  [data-theme="light"] #jf-resp,
+  [data-theme="light"] #jf-statut {
+    background: #ffffff !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+  }
+
+  /* Selects inline dans les lignes de la table jalons (JOUR, TYPE, RESPONSABLE, STATUT) */
+  [data-theme="light"] #jalons-tbody td select {
+    background: #f0f4f8 !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+  }
+
+  /* Bouton "+ Jalon" dans barre jalons (déjà var(--blue) blanc : OK) */
+  /* Bouton "+ Ligne vide" : green néon → vert lisible */
+  [data-theme="light"] #btn-jalons-add-row {
+    background: rgba(22,163,74,.12) !important;
+    color: #15803d !important;
+    border-color: rgba(22,163,74,.4) !important;
+  }
+  /* Bouton "↺ Réinitialiser" jalons : amber néon → ambre foncé */
+  [data-theme="light"] #btn-jalons-reset {
+    background: rgba(245,158,11,.12) !important;
+    color: #92400e !important;
+    border-color: rgba(245,158,11,.4) !important;
+  }
+  /* Bouton "🖨 Imprimer" planning : green néon → vert lisible */
+  [data-theme="light"] #btn-plan-print {
+    background: rgba(22,163,74,.12) !important;
+    color: #15803d !important;
+    border-color: rgba(22,163,74,.4) !important;
+  }
+  /* Bouton "↺ Réinitialiser" planning : amber néon → ambre foncé */
+  [data-theme="light"] #btn-plan-reset {
+    background: rgba(245,158,11,.12) !important;
+    color: #92400e !important;
+    border-color: rgba(245,158,11,.4) !important;
+  }
+
+  /* Bandeaux "+ Jalon" inline dans les sec-label : fond bleu pâle */
+  [data-theme="light"] .plan-cell.sec-label button {
+    background: rgba(30,95,168,.15) !important;
+    color: #1e3a5f !important;
+    border-color: rgba(30,95,168,.35) !important;
+  }
+
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
     font-family: var(--sans);
@@ -1608,12 +1667,12 @@
           padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)">
         🔄 Actualiser météo
       </button>
-      <button onclick="printPlanning()"
+      <button id="btn-plan-print" onclick="printPlanning()"
         style="background:rgba(22,163,74,.2);color:var(--green);border:1px solid rgba(22,163,74,.3);
           border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)">
         🖨 Imprimer
       </button>
-      <button onclick="resetPlanningCells()"
+      <button id="btn-plan-reset" onclick="resetPlanningCells()"
         style="background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3);
           border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)">
         ↺ Réinitialiser
@@ -1930,12 +1989,12 @@
                  border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)">
           + Jalon
         </button>
-        <button onclick="jalonsAddRow()"
+        <button id="btn-jalons-add-row" onclick="jalonsAddRow()"
           style="background:rgba(22,163,74,.2);color:var(--green);border:1px solid rgba(22,163,74,.3);
                  border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">
           + Ligne vide
         </button>
-        <button onclick="jalonsReset()"
+        <button id="btn-jalons-reset" onclick="jalonsReset()"
           style="background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.3);
                  border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">
           ↺ Réinitialiser
