@@ -1,4 +1,4 @@
-<!-- BUILD:v22 -->
+<!-- BUILD:v23 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -2371,7 +2371,8 @@
       <div class="jalon-modal-grid2">
         <div class="jalon-modal-row">
           <label>Jour *</label>
-          <select id="jm-jour"></select>
+          <input type="text" id="jm-jour" placeholder="JJ/MM/AAAA" readonly
+            style="width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px;cursor:pointer">
         </div>
         <div class="jalon-modal-row">
           <label>Heure *</label>
@@ -2381,17 +2382,13 @@
       <div class="jalon-modal-grid2">
         <div class="jalon-modal-row">
           <label>Type *</label>
-          <select id="jm-type"></select>
+          <input type="text" id="jm-type" list="jm-type-datalist" placeholder="Choisir ou taper..."
+            style="width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px">
+          <datalist id="jm-type-datalist"></datalist>
         </div>
         <div class="jalon-modal-row">
           <label>Statut *</label>
-          <select id="jm-statut">
-            <option>À faire</option>
-            <option>En cours</option>
-            <option>Fait</option>
-            <option>Bloquant</option>
-            <option>Reporté</option>
-          </select>
+          <select id="jm-statut"></select>
         </div>
       </div>
       <div class="jalon-modal-row">
@@ -2401,9 +2398,9 @@
       <div class="jalon-modal-grid2">
         <div class="jalon-modal-row">
           <label>Responsable *</label>
-          <select id="jm-resp">
-            <option value="">— Sélectionner —</option>
-          </select>
+          <input type="text" id="jm-resp" list="jm-resp-datalist" placeholder="Nom du responsable..."
+            style="width:100%;padding:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px">
+          <datalist id="jm-resp-datalist"></datalist>
         </div>
         <div class="jalon-modal-row">
           <label>Ligne planning</label>
@@ -3766,6 +3763,31 @@ const RESPONSABLES = [
   'SWDE Exploitation','Bureau d\'études','Coord. sécu.','Sous-traitant'
 ];
 
+function loadCustomJalonTypes() {
+  try { return JSON.parse(localStorage.getItem('jalon_custom_types') || '[]'); } catch(e) { return []; }
+}
+function saveCustomJalonType(val) {
+  if (!val) return;
+  const types = loadCustomJalonTypes();
+  if (!types.includes(val)) { types.push(val); localStorage.setItem('jalon_custom_types', JSON.stringify(types)); }
+}
+function loadCustomResponsables() {
+  try { return JSON.parse(localStorage.getItem('jalon_custom_resp') || '[]'); } catch(e) { return []; }
+}
+function saveCustomResponsable(val) {
+  if (!val) return;
+  const resp = loadCustomResponsables();
+  if (!resp.includes(val)) { resp.push(val); localStorage.setItem('jalon_custom_resp', JSON.stringify(resp)); }
+}
+function loadCustomLieux() {
+  try { return JSON.parse(localStorage.getItem('jalon_custom_lieux') || '[]'); } catch(e) { return []; }
+}
+function saveCustomLieu(val) {
+  if (!val) return;
+  const lieux = loadCustomLieux();
+  if (!lieux.includes(val)) { lieux.push(val); localStorage.setItem('jalon_custom_lieux', JSON.stringify(lieux)); }
+}
+
 const JALONS_PROJET = [
   { date: new Date(2026, 5,  1), heure:'07h00', type:'⚡ JALON', description:"Tâche 45 — Ouverture top CE + escalier colimaçon (DÉMARRAGE)", lieu:'CE Rhisnes – Suarlée', statut:'CRITIQUE', isProjet:true },
   { date: new Date(2026, 5,  8), heure:'07h00', type:'⚡ JALON', description:"Tâche 21 — Montage échafaudage + lift (DÉMARRAGE)", lieu:'CE Rhisnes – Suarlée', statut:'CRITIQUE', isProjet:true },
@@ -3821,7 +3843,7 @@ function buildDayLabel(jourOffset, weekNum) {
 }
 
 function buildDayOptions(weekNum, selected) {
-  return [0,1,2,3,4,5].map(i =>
+  return [0,1,2,3,4,5,6].map(i =>
     '<option value="' + i + '"' + (i === selected ? ' selected' : '') + '>' + buildDayLabel(i, weekNum) + '</option>'
   ).join('');
 }
@@ -3887,13 +3909,14 @@ function renderJalons(weekNum) {
   }
 
   rowsFiltered.forEach((row, idx) => {
-    const isCritical = row.statut === 'CRITIQUE';
+    const isCritical = row.statut === 'CRITIQUE' || row.statut === 'Bloquant' || row.statut === 'BLOQUANT';
     const isProjet   = !!row.isProjet;
     const tr = document.createElement('tr');
     if (isCritical) tr.className = 'critical';
 
-    const dayOptsHtml = buildDayOptions(weekNum, typeof row.jour === 'number' ? row.jour : 0);
-    const typeOptsHtml = Object.keys(JALON_TYPES).map(t =>
+    const isDateString = typeof row.jour === 'string' && row.jour.includes('/');
+    const dayOptsHtml = isDateString ? '' : buildDayOptions(weekNum, typeof row.jour === 'number' ? row.jour : 0);
+    const typeOptsHtml = [...Object.keys(JALON_TYPES), ...loadCustomJalonTypes()].map(t =>
       '<option value="' + t + '"' + (t === row.type ? ' selected' : '') + '>' + t + '</option>'
     ).join('');
     const statutOptsHtml = Object.keys(STATUT_TYPES).map(s =>
@@ -3909,11 +3932,38 @@ function renderJalons(weekNum) {
     // Cellule Jour
     const tdJour = document.createElement('td');
     tdJour.style.cssText = 'padding:4px 6px';
-    const selJour = document.createElement('select');
-    selJour.setAttribute('style', ss + ';font-size:11px;font-weight:600');
-    selJour.innerHTML = dayOptsHtml;
-    selJour.addEventListener('change', (function(i){ return function(){ jalonsUpdateRow(i,'jour',parseInt(this.value)); }; })(idx));
-    tdJour.appendChild(selJour);
+    if (isDateString) {
+      // Nouveau format DD/MM/YYYY — afficher un input text avec flatpickr
+      const inpJour = document.createElement('input');
+      inpJour.type = 'text';
+      inpJour.value = row.jour;
+      inpJour.readOnly = true;
+      inpJour.setAttribute('style', ss + ';font-size:11px;font-weight:600;cursor:pointer');
+      inpJour.addEventListener('focus', (function(i, inp){ return function(){
+        if (inp._flatpickr) { inp._flatpickr.open(); return; }
+        flatpickr(inp, {
+          locale: {
+            weekdays: { shorthand:['dim','lun','mar','mer','jeu','ven','sam'], longhand:['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'] },
+            months: { shorthand:['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'], longhand:['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'] },
+            firstDayOfWeek: 1,
+          },
+          dateFormat: 'd/m/Y',
+          allowInput: false,
+          disableMobile: true,
+          defaultDate: inp.value,
+          onClose: function(selectedDates, dateStr) { jalonsUpdateRow(i, 'jour', dateStr); },
+        });
+        inp._flatpickr.open();
+      }; })(idx, inpJour));
+      tdJour.appendChild(inpJour);
+    } else {
+      // Ancien format numérique — conserver le select pour rétrocompatibilité
+      const selJour = document.createElement('select');
+      selJour.setAttribute('style', ss + ';font-size:11px;font-weight:600');
+      selJour.innerHTML = dayOptsHtml;
+      selJour.addEventListener('change', (function(i){ return function(){ jalonsUpdateRow(i,'jour',parseInt(this.value)); }; })(idx));
+      tdJour.appendChild(selJour);
+    }
     if (isProjet) {
       const lbl = document.createElement('div');
       lbl.style.cssText = 'font-size:9px;color:var(--amber);margin-top:2px;font-family:var(--mono)';
@@ -3953,7 +4003,7 @@ function renderJalons(weekNum) {
     const selResp = document.createElement('select');
     selResp.setAttribute('style', ss);
     selResp.innerHTML = '<option value="">—</option>' +
-      RESPONSABLES.map(r => '<option value="'+r+'"'+(r===(row.responsable||'')?' selected':'')+'>'+r+'</option>').join('');
+      [...RESPONSABLES, ...loadCustomResponsables()].map(r => '<option value="'+r+'"'+(r===(row.responsable||'')?' selected':'')+'>'+r+'</option>').join('');
     selResp.addEventListener('change', (function(i){ return function(){ jalonsUpdateRow(i,'responsable',this.value); }; })(idx));
     tdResp.appendChild(selResp);
 
@@ -4063,18 +4113,43 @@ function ouvrirFicheJalon(idx, prefill) {
   const btnDel = document.getElementById('jm-btn-del');
   btnDel.style.display = (_ficheEditIdx !== null && !(_jalonsRows[_ficheEditIdx]||{}).isProjet) ? '' : 'none';
 
-  // Peupler le select Jour
-  const selJour = document.getElementById('jm-jour');
-  selJour.innerHTML = buildDayOptions(_currentJalonsWeek, -1);
+  // Init flatpickr sur #jm-jour
+  const fpJour = document.getElementById('jm-jour');
+  if (fpJour) {
+    if (fpJour._flatpickr) fpJour._flatpickr.destroy();
+    flatpickr(fpJour, {
+      locale: {
+        weekdays: { shorthand:['dim','lun','mar','mer','jeu','ven','sam'], longhand:['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'] },
+        months: { shorthand:['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'], longhand:['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'] },
+        firstDayOfWeek: 1,
+      },
+      dateFormat: 'd/m/Y',
+      allowInput: false,
+      disableMobile: true,
+    });
+  }
 
-  // Peupler le select Type
-  const selType = document.getElementById('jm-type');
-  selType.innerHTML = Object.keys(JALON_TYPES).map(t => '<option>'+t+'</option>').join('');
+  // Peupler datalist TYPE
+  const dlType = document.getElementById('jm-type-datalist');
+  if (dlType) {
+    const allTypes = [...Object.keys(JALON_TYPES), ...loadCustomJalonTypes()];
+    dlType.innerHTML = allTypes.map(t => '<option value="'+t+'">').join('');
+  }
 
-  // Peupler le select Responsable
-  const selResp = document.getElementById('jm-resp');
-  selResp.innerHTML = '<option value="">— Sélectionner —</option>' +
-    RESPONSABLES.map(r => '<option>'+r+'</option>').join('');
+  // Peupler #jm-statut depuis STATUT_TYPES
+  const selStatut = document.getElementById('jm-statut');
+  if (selStatut) {
+    selStatut.innerHTML = Object.entries(STATUT_TYPES)
+      .filter(([k]) => !['PLANIFIÉ','CRITIQUE','FAIT','ANNULÉ','REPORTÉ'].includes(k))
+      .map(([k, v]) => '<option value="'+k+'">'+k+'</option>').join('');
+  }
+
+  // Peupler datalist RESPONSABLE
+  const dlResp = document.getElementById('jm-resp-datalist');
+  if (dlResp) {
+    const allResp = [...RESPONSABLES, ...loadCustomResponsables()];
+    dlResp.innerHTML = allResp.map(r => '<option value="'+r+'">').join('');
+  }
 
   // Valeurs par défaut ou existantes
   let row = {};
@@ -4084,18 +4159,54 @@ function ouvrirFicheJalon(idx, prefill) {
     row = prefill;
   }
 
-  selJour.value        = typeof row.jour === 'number' ? row.jour : 0;
+  // Définir la date dans le champ jour
+  if (fpJour) {
+    if (typeof row.jour === 'string' && row.jour.includes('/')) {
+      fpJour._flatpickr.setDate(row.jour, false, 'd/m/Y');
+    } else if (typeof row.jour === 'number') {
+      // Convertir offset numérique en date réelle pour la semaine courante
+      const year = new Date().getFullYear();
+      const monday = getMondayOfISOWeek(_currentJalonsWeek, year);
+      const dayDate = new Date(monday);
+      dayDate.setUTCDate(monday.getUTCDate() + row.jour);
+      const dd = String(dayDate.getUTCDate()).padStart(2,'0');
+      const mm = String(dayDate.getUTCMonth()+1).padStart(2,'0');
+      const yyyy = dayDate.getUTCFullYear();
+      fpJour._flatpickr.setDate(dd+'/'+mm+'/'+yyyy, false, 'd/m/Y');
+    } else {
+      fpJour._flatpickr.clear();
+    }
+  }
+
   document.getElementById('jm-heure').value      = (row.heure || '07:00').replace('h',':');
-  selType.value        = row.type || 'RÉUNION';
+  document.getElementById('jm-type').value       = row.type || 'RÉUNION';
   document.getElementById('jm-statut').value     = row.statut || 'À faire';
   document.getElementById('jm-desc').value       = row.description || '';
-  selResp.value        = row.responsable || '';
+  document.getElementById('jm-resp').value       = row.responsable || '';
   document.getElementById('jm-ligne').value      = row.lignePlanning || '';
   document.getElementById('jm-lieu').value       = row.lieu || '';
   document.getElementById('jm-entreprise').value = row.entreprise || '';
   document.getElementById('jm-tache').value      = row.refTache || '';
   document.getElementById('jm-priorite').value   = row.priorite || '';
   document.getElementById('jm-note').value       = row.note || '';
+
+  // Peupler lieu-datalist avec lieux personnalisés
+  const dlLieu = document.getElementById('lieu-datalist');
+  if (dlLieu) {
+    const customLieux = loadCustomLieux();
+    // Supprimer les anciens custom (ceux qui ne sont pas dans le HTML statique)
+    const staticLieux = ['CE Rhisnes – Suarlée','Bureau chantier','Bureau d\'études','Téléphone / Teams','SWDE — Namur'];
+    Array.from(dlLieu.querySelectorAll('option')).forEach(opt => {
+      if (!staticLieux.includes(opt.value)) opt.remove();
+    });
+    customLieux.forEach(l => {
+      if (!staticLieux.includes(l)) {
+        const opt = document.createElement('option');
+        opt.value = l;
+        dlLieu.appendChild(opt);
+      }
+    });
+  }
 
   document.getElementById('jalon-modal-overlay').classList.add('open');
   setTimeout(() => document.getElementById('jm-desc').focus(), 100);
@@ -4107,27 +4218,37 @@ function fermerFicheJalon() {
 }
 
 function enregistrerFicheJalon(placerAuPlanning) {
-  const desc = document.getElementById('jm-desc').value.trim();
-  const type = document.getElementById('jm-type').value;
-  const resp = document.getElementById('jm-resp').value;
-  const jour = parseInt(document.getElementById('jm-jour').value, 10);
+  const desc    = document.getElementById('jm-desc').value.trim();
+  const typeVal = document.getElementById('jm-type')?.value?.trim();
+  const respVal = document.getElementById('jm-resp')?.value?.trim();
+  // jourVal est maintenant "DD/MM/YYYY" via flatpickr
+  const jourVal = document.getElementById('jm-jour')?.value;
 
   if (!desc) { document.getElementById('jm-desc').focus(); return; }
-  if (!type) { document.getElementById('jm-type').focus(); return; }
+  if (!typeVal) { showToast('Le type est requis', 'red'); document.getElementById('jm-type').focus(); return; }
+  if (!respVal) { showToast('Le responsable est requis', 'red'); return; }
+
+  // Mémoriser type/responsable personnalisés
+  if (typeVal && !Object.keys(JALON_TYPES).includes(typeVal)) saveCustomJalonType(typeVal);
+  if (respVal && !RESPONSABLES.includes(respVal)) saveCustomResponsable(respVal);
+
+  // Mémoriser le lieu saisi
+  const lieuVal = document.getElementById('jm-lieu')?.value?.trim();
+  if (lieuVal) saveCustomLieu(lieuVal);
 
   // Convertir heure HH:MM → HHhMM
   const heureRaw = document.getElementById('jm-heure').value || '07:00';
   const heure = heureRaw.replace(':', 'h');
 
   const newRow = {
-    jour,
+    jour:          jourVal,
     heure,
-    type,
+    type:          typeVal,
     statut:        document.getElementById('jm-statut').value || 'À faire',
     description:   desc,
-    responsable:   resp,
+    responsable:   respVal,
     lignePlanning: document.getElementById('jm-ligne').value,
-    lieu:          document.getElementById('jm-lieu').value,
+    lieu:          lieuVal || '',
     entreprise:    document.getElementById('jm-entreprise').value,
     refTache:      document.getElementById('jm-tache').value,
     priorite:      document.getElementById('jm-priorite').value,
