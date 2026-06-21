@@ -261,7 +261,7 @@
     border: 1px solid var(--border);
     border-radius: 10px;
     margin-bottom: 16px;
-    overflow: hidden;
+    overflow: visible;
   }
   .section-header {
     background: var(--surface);
@@ -871,6 +871,8 @@
   .hommes-suggestion-item:hover { background:var(--card); }
 
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
 
@@ -5893,11 +5895,59 @@ window.switchTab = function(name, btn) {
     HommesModule.renderWorkersList();
     HommesModule.renderGrid();
     HommesModule.renderHistory();
+    setTimeout(initFlatpickr, 50);
   }
 };
 
 console.log('[BLOC HOMMES] SDK localStorage chargé avec succès.');
 
+</script>
+
+<script>
+/* ── Flatpickr — init des date-pickers Planning Hommes ── */
+function initFlatpickr() {
+  if (typeof flatpickr === 'undefined') return;
+  ['#hommes-start-date','#hommes-end-date'].forEach(id => {
+    const el = document.querySelector(id);
+    if (el && el._flatpickr) el._flatpickr.destroy();
+  });
+
+  const localeFr = {
+    weekdays: {
+      shorthand: ['dim','lun','mar','mer','jeu','ven','sam'],
+      longhand: ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'],
+    },
+    months: {
+      shorthand: ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'],
+      longhand: ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'],
+    },
+    firstDayOfWeek: 1,
+  };
+
+  flatpickr('#hommes-start-date', {
+    locale: localeFr,
+    dateFormat: 'd/m/Y',
+    allowInput: true,
+    disableMobile: true,
+    onChange([date]) {
+      const fpEnd = document.getElementById('hommes-end-date')._flatpickr;
+      if (fpEnd && fpEnd.selectedDates[0] && date > fpEnd.selectedDates[0]) fpEnd.setDate(date);
+      if (fpEnd) fpEnd.set('minDate', date);
+    },
+  });
+
+  flatpickr('#hommes-end-date', {
+    locale: localeFr,
+    dateFormat: 'd/m/Y',
+    allowInput: true,
+    disableMobile: true,
+    onChange([date]) {
+      const fpS = document.getElementById('hommes-start-date')._flatpickr;
+      if (fpS && fpS.selectedDates[0] && date < fpS.selectedDates[0]) fpS.setDate(date);
+    },
+  });
+}
+initFlatpickr();
 </script>
 </body>
 </html>
