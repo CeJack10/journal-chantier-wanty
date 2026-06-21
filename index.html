@@ -1,4 +1,4 @@
-<!-- BUILD:v20 -->
+<!-- BUILD:v21 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -149,6 +149,112 @@
     background: #1a2744;
     color: #f59e0b;
     border-color: #2e3d5a;
+  }
+
+  /* ── Mode Jour : correctifs supplémentaires ──────────────── */
+
+  /* Champs readonly (f-client, n°journal…) : fond clair ambre discret */
+  [data-theme="light"] input[readonly] {
+    background: #fffbeb;
+    color: #92400e;
+    border-color: rgba(245,158,11,.4);
+  }
+
+  /* Cellules grille planning semaine */
+  [data-theme="light"] .plan-cell.task {
+    background: #f0f5fa;
+    color: var(--text);
+  }
+  [data-theme="light"] .plan-cell.empty {
+    background: #e8eef5;
+    color: var(--muted);
+  }
+  [data-theme="light"] .plan-cell.sec-label {
+    background: #1a2744;
+    color: #93c5fd;
+  }
+
+  /* Cellules colorées planning : couleurs plus saturées pour fond clair */
+  [data-theme="light"] .plan-cell.alert-cell {
+    background: rgba(220,38,38,.08);
+    border-color: rgba(220,38,38,.3);
+    color: #b91c1c;
+  }
+  [data-theme="light"] .plan-cell.coord-cell {
+    background: rgba(30,95,168,.07);
+    border-color: rgba(30,95,168,.25);
+    color: #1e5fa8;
+  }
+  [data-theme="light"] .plan-cell.prep-cell {
+    background: rgba(22,163,74,.07);
+    border-color: rgba(22,163,74,.25);
+    color: #15803d;
+  }
+  [data-theme="light"] .plan-cell.secu-cell {
+    background: rgba(245,158,11,.08);
+    border-color: rgba(245,158,11,.3);
+    color: #b45309;
+  }
+  [data-theme="light"] .plan-cell.bypass-cell {
+    background: rgba(124,58,237,.07);
+    border-color: rgba(124,58,237,.25);
+    color: #7c3aed;
+  }
+
+  /* Badges de type dans la grille planning (couleurs lisibles sur fond clair) */
+  [data-theme="light"] .badge-coord { background: #dbeafe; color: #1e5fa8; }
+  [data-theme="light"] .badge-prep  { background: #dcfce7; color: #15803d; }
+  [data-theme="light"] .badge-secu  { background: #fef3c7; color: #b45309; }
+  [data-theme="light"] .badge-bypass{ background: #ede9fe; color: #7c3aed; }
+  [data-theme="light"] .badge-alert { background: #fee2e2; color: #b91c1c; }
+
+  /* Badge AUTO (section-header) : bleu pâle au lieu de bleu vif sur fond gris clair */
+  [data-theme="light"] .section-header .badge {
+    background: #dbeafe;
+    color: #1e5fa8;
+  }
+
+  /* Modale jalon : champs avec background var(--navy) hardcodé */
+  [data-theme="light"] .jalon-modal-row input,
+  [data-theme="light"] .jalon-modal-row select,
+  [data-theme="light"] .jalon-modal-row textarea {
+    background: #ffffff;
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  /* Modale chantier : --surface2 non défini en light */
+  [data-theme="light"] .chantier-modal-row input,
+  [data-theme="light"] .chantier-modal-row select {
+    background: #ffffff;
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  /* Table synthèse : en-tête navy → reste sombre (intentionnel, texte blanc OK) */
+  /* jalons tr.critical : texte rose → rouge lisible */
+  [data-theme="light"] .jalons-table tr.critical td {
+    background: rgba(220,38,38,.06);
+    color: #b91c1c;
+  }
+
+  /* Brouillon chip : texte jaune sur fond clair → ambre foncé */
+  [data-theme="light"] .draft-chip {
+    background: rgba(245,158,11,.10);
+    border-color: rgba(245,158,11,.4);
+    color: #92400e;
+  }
+
+  /* mini-btn danger : texte rose → rouge lisible */
+  [data-theme="light"] .mini-btn.danger { color: #b91c1c; }
+
+  /* btn-warning : texte jaune pâle → ambre foncé */
+  [data-theme="light"] .btn-warning { color: #92400e; }
+
+  /* Grille hommes : en-têtes et noms sur fond clair */
+  [data-theme="light"] #hommes-week-grid > div:not([style*="var(--orange)"]):not([style*="var(--red)"]) {
+    background: #f0f5fa !important;
+    color: var(--text) !important;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
