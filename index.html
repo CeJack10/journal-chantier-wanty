@@ -1,4 +1,4 @@
-<!-- BUILD:v23 -->
+<!-- BUILD:v24 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -2004,7 +2004,7 @@
         <thead>
           <tr>
             <th style="width:110px">Jour</th>
-            <th style="width:55px">Heure</th>
+            <th style="width:70px">Heure</th>
             <th style="width:90px">Type</th>
             <th>Description</th>
             <th style="width:100px">Responsable</th>
@@ -3927,7 +3927,7 @@ function renderJalons(weekNum) {
     tr.dataset.idx = idx;
     tr.dataset.isprojet = isProjet ? '1' : '0';
 
-    const ss = 'background:var(--navy);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:10px;padding:2px 3px;width:100%;cursor:pointer';
+    const ss = 'background:var(--surface);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:10px;padding:2px 3px;width:100%;cursor:pointer';
 
     // Cellule Jour
     const tdJour = document.createElement('td');
@@ -3977,7 +3977,7 @@ function renderJalons(weekNum) {
     const inpHeure = document.createElement('input');
     inpHeure.type = 'text';
     inpHeure.value = row.heure || '';
-    inpHeure.setAttribute('style','background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;width:52px;text-align:center');
+    inpHeure.setAttribute('style','background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;width:62px;text-align:center');
     inpHeure.addEventListener('input', (function(i){ return function(){ jalonsUpdateRow(i,'heure',this.value); }; })(idx));
     tdHeure.appendChild(inpHeure);
 
