@@ -1,4 +1,4 @@
-<!-- BUILD:v19 -->
+<!-- BUILD:v20 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -2048,11 +2048,12 @@
 <!-- Modale : Conflit détecté -->
 <div id="hommes-conflict-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.5)">
-    <h3 style="margin-top:0;color:var(--red)">⚠️ Conflit détecté</h3>
+    <h3 style="margin-top:0;color:var(--red)">Conflit détecté</h3>
     <p id="hommes-conflict-msg" style="color:var(--text);margin:12px 0">—</p>
+    <div id="hommes-conflict-locked-by" style="margin:12px 0;padding:10px;background:var(--surface);border-left:3px solid var(--amber);border-radius:4px;font-size:11px;color:var(--muted)">Verrouillé par : <strong id="hommes-conflict-locker-name">—</strong></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
-      <button onclick="HommesModule.closeConflictModal()" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text)">❌ Annuler</button>
-      <button onclick="HommesModule.requestUnlock()" style="padding:10px;background:var(--orange);border:none;border-radius:4px;cursor:pointer;color:white;font-weight:500">🔓 Demander déblocage</button>
+      <button onclick="HommesModule.closeConflictModal()" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text)">Annuler</button>
+      <button onclick="HommesModule.requestUnlock()" style="padding:10px;background:var(--orange);border:none;border-radius:4px;cursor:pointer;color:white;font-weight:500">Entrer le code</button>
     </div>
   </div>
 </div>
@@ -2082,12 +2083,24 @@
 <div id="hommes-unlock-verify-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:400px">
     <h3 style="margin-top:0;color:var(--amber)">🔓 Saisir le code</h3>
-    <p style="color:var(--muted);font-size:11px;margin:12px 0">Entrez le code 4 chiffres communiqué par l'autre conducteur.</p>
+    <p style="color:var(--muted);font-size:11px;margin:12px 0">Entrez le code 4 chiffres du créateur de la réservation. <span id="hommes-verify-attempts" style="color:var(--red)"></span></p>
     <input type="text" id="hommes-code-input" maxlength="4" placeholder="1234" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:4px;font-family:var(--mono);font-size:16px;text-align:center;margin:12px 0">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
       <button onclick="HommesModule.closeVerifyModal()" style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text)">❌ Annuler</button>
       <button onclick="HommesModule.verifyAndUnlock()" style="padding:10px;background:var(--green);border:none;border-radius:4px;cursor:pointer;color:white;font-weight:500">✓ Débloquer</button>
     </div>
+  </div>
+</div>
+
+<!-- Modale : Code de session révélé après création -->
+<div id="hommes-lock-reveal-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:24px;max-width:360px;text-align:center">
+    <div style="font-size:28px;margin-bottom:8px">✓</div>
+    <h3 style="margin-top:0;color:var(--green)">Réservation créée</h3>
+    <p style="color:var(--muted);font-size:11px;margin:8px 0 16px">Code de session — notez-le, il ne sera plus affiché :</p>
+    <div id="hommes-reveal-code-display" style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--amber);letter-spacing:8px;padding:12px;background:var(--surface);border:2px solid var(--amber);border-radius:8px;margin:12px 0">—</div>
+    <p style="color:var(--muted);font-size:10px;margin:8px 0">Communiquez ce code aux autres conducteurs si une modification est nécessaire.</p>
+    <button onclick="HommesModule.closeLockRevealModal()" style="width:100%;padding:12px;background:var(--green);border:none;border-radius:4px;cursor:pointer;color:white;font-weight:600;font-size:14px;margin-top:8px">J'ai noté le code</button>
   </div>
 </div>
 
@@ -4146,7 +4159,7 @@ function updateSyntheseCounters() {
     if (diff <= 14) nImm++;
   });
   const total = working.length;
-  const counterEl = document.querySelector('#tab-synthese .plan-header div:last-child');
+  const counterEl = document.getElementById('synth-counters');
   if (counterEl) {
     counterEl.innerHTML =
       '<div style="font-size:20px;font-family:var(--mono);color:var(--amber);font-weight:700">' + total + ' tâches</div>' +
@@ -4547,6 +4560,7 @@ function getUserCode() {
 function getUserName(code) {
   return (USERS[code] || USERS_BASE['JJ']).name;
 }
+function getCurrentUser() { return getUserName(getUserCode()); }
 
 // ═══════════════════════════════════════════════════════════════════
 //  GESTION CHANTIERS DYNAMIQUES
@@ -5152,6 +5166,8 @@ const StorageAdapter = {
       end_date: allocation.end_date,
       status: 'reserved',
       created_by: allocation.created_by || 'Inconnu',
+      lockedBy: allocation.created_by || 'Inconnu',
+      lockCode: String(Math.floor(1000 + Math.random() * 9000)),
       created_at: new Date().toISOString()
     };
 
@@ -5168,7 +5184,7 @@ const StorageAdapter = {
       actor: newAlloc.created_by
     });
 
-    return { status: 'OK', allocation: newAlloc };
+    return { status: 'OK', allocation: newAlloc, lockCode: newAlloc.lockCode };
   },
 
   // 4. Récupérer l'historique
@@ -5525,19 +5541,31 @@ const HommesModule = {
 
   async submitReservation() {
     const workerId = document.getElementById('hommes-worker-input')?.dataset.workerId;
-    const site = document.getElementById('hommes-site-input')?.value;
+    const site = document.getElementById('hommes-site-input')?.value?.trim();
     const startDate = document.getElementById('hommes-start-date')?.value;
     const endDate = document.getElementById('hommes-end-date')?.value;
 
     if (!workerId || !site || !startDate || !endDate) {
-      alert('❌ Tous les champs sont obligatoires');
+      showToast('Tous les champs sont obligatoires', 'red');
+      return;
+    }
+
+    const parseInputDate = s => {
+      if (!s) return null;
+      if (s.includes('/')) { const [d,m,y] = s.split('/'); return new Date(+y, +m-1, +d); }
+      const [y,m,d] = s.split('-'); return new Date(+y, +m-1, +d);
+    };
+    const dStart = parseInputDate(startDate);
+    const dEnd = parseInputDate(endDate);
+    if (dStart && dEnd && dEnd < dStart) {
+      showToast('La date de fin doit être après la date de début', 'red');
       return;
     }
 
     const workers = StorageAdapter.fetchWorkers();
     const worker = workers.find(w => w.id === workerId);
     if (!worker) {
-      alert('❌ Homme non trouvé');
+      showToast('Homme non trouvé', 'red');
       return;
     }
 
@@ -5547,16 +5575,19 @@ const HommesModule = {
       site,
       start_date: startDate,
       end_date: endDate,
-      created_by: 'Jean-Jacques'
+      created_by: getCurrentUser()
     });
 
     if (result.status === 'CONFLICT') {
       this.currentConflict = result.conflicting;
+      const locker = result.conflicting.lockedBy || result.conflicting.created_by || 'Inconnu';
       document.getElementById('hommes-conflict-msg').textContent =
-        `${result.conflicting.worker_name} est déjà réservé du ${result.conflicting.start_date} au ${result.conflicting.end_date} (par ${result.conflicting.created_by}).`;
+        `${result.conflicting.worker_name} est réservé du ${result.conflicting.start_date} au ${result.conflicting.end_date}.`;
+      document.getElementById('hommes-conflict-locker-name').textContent = locker;
       document.getElementById('hommes-conflict-modal').style.display = 'flex';
     } else if (result.status === 'OK') {
-      alert('✓ Réservation créée');
+      document.getElementById('hommes-reveal-code-display').textContent = result.lockCode;
+      document.getElementById('hommes-lock-reveal-modal').style.display = 'flex';
       const input = document.getElementById('hommes-worker-input');
       input.value = '';
       input.dataset.workerId = '';
@@ -5569,14 +5600,22 @@ const HommesModule = {
     }
   },
 
+  unlockAttempts: 0,
+
+  closeLockRevealModal() {
+    document.getElementById('hommes-lock-reveal-modal').style.display = 'none';
+  },
+
   closeConflictModal() {
     document.getElementById('hommes-conflict-modal').style.display = 'none';
   },
 
   requestUnlock() {
     this.closeConflictModal();
-    document.getElementById('hommes-unlock-generate-modal').style.display = 'flex';
     this.unlockedAllocation = this.currentConflict;
+    document.getElementById('hommes-verify-attempts').textContent = '';
+    document.getElementById('hommes-unlock-verify-modal').style.display = 'flex';
+    setTimeout(() => document.getElementById('hommes-code-input').focus(), 50);
   },
 
   generateUnlockCode() {
@@ -5626,50 +5665,61 @@ const HommesModule = {
   },
 
   verifyAndUnlock() {
-    const enteredCode = document.getElementById('hommes-code-input')?.value;
-    const storedHash = sessionStorage.getItem('hommes_unlock_code_hash');
-    const allocId = sessionStorage.getItem('hommes_unlock_allocation_id');
-
-    if (!enteredCode || !storedHash) {
-      alert('❌ Code ou allocation manquants');
+    const enteredCode = (document.getElementById('hommes-code-input')?.value || '').trim();
+    if (!enteredCode) {
+      showToast('Entrez le code à 4 chiffres', 'red');
       return;
     }
 
-    const encoder = new TextEncoder();
-    const data = encoder.encode(enteredCode);
-    crypto.subtle.digest('SHA-256', data).then(hashBuffer => {
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const enteredHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const blockUntil = parseInt(sessionStorage.getItem('hommes_unlock_block_until') || '0');
+    if (Date.now() < blockUntil) {
+      const mins = Math.ceil((blockUntil - Date.now()) / 60000);
+      showToast('Trop de tentatives — réessayez dans ' + mins + ' min', 'red');
+      return;
+    }
 
-      if (enteredHash !== storedHash) {
-        alert('❌ Code incorrect');
-        return;
+    const storedCode = this.unlockedAllocation?.lockCode;
+    if (!storedCode) {
+      showToast('Réservation introuvable', 'red');
+      return;
+    }
+
+    if (enteredCode !== storedCode) {
+      this.unlockAttempts = (this.unlockAttempts || 0) + 1;
+      if (this.unlockAttempts >= 3) {
+        sessionStorage.setItem('hommes_unlock_block_until', String(Date.now() + 5 * 60 * 1000));
+        this.unlockAttempts = 0;
+        showToast('3 tentatives échouées — blocage 5 minutes', 'red');
+        this.closeVerifyModal();
+      } else {
+        const remaining = 3 - this.unlockAttempts;
+        document.getElementById('hommes-verify-attempts').textContent = '(' + remaining + ' tentative(s) restante(s))';
+        showToast('Code incorrect', 'red');
       }
+      return;
+    }
 
-      // Code correct : marquer l'allocation comme remplacée
-      const allocs = StorageAdapter.fetchAllocations();
-      const idx = allocs.findIndex(a => a.id === allocId);
-      if (idx >= 0) {
-        allocs[idx].status = 'replaced';
-        localStorage.setItem(StorageAdapter.ALLOCATIONS_KEY, JSON.stringify(allocs));
+    this.unlockAttempts = 0;
+    const allocs = StorageAdapter.fetchAllocations();
+    const allocId = this.unlockedAllocation.id;
+    const idx = allocs.findIndex(a => a.id === allocId);
+    if (idx >= 0) {
+      allocs[idx].status = 'replaced';
+      localStorage.setItem(StorageAdapter.ALLOCATIONS_KEY, JSON.stringify(allocs));
+      StorageAdapter.saveHistory({
+        action: 'allocation_unlocked',
+        allocation_id: allocId,
+        worker_name: allocs[idx].worker_name,
+        dates: allocs[idx].start_date + ' → ' + allocs[idx].end_date,
+        status: 'replaced',
+        actor: getCurrentUser()
+      });
+    }
 
-        StorageAdapter.saveHistory({
-          action: 'allocation_unlocked',
-          allocation_id: allocId,
-          worker_name: allocs[idx].worker_name,
-          dates: `${allocs[idx].start_date} → ${allocs[idx].end_date}`,
-          status: 'replaced',
-          actor: 'Déblocage'
-        });
-      }
-
-      alert('✓ Allocation débloquée et remplacée');
-      this.closeVerifyModal();
-      sessionStorage.removeItem('hommes_unlock_code_hash');
-      sessionStorage.removeItem('hommes_unlock_allocation_id');
-      this.renderGrid();
-      this.renderHistory();
-    });
+    showToast('Réservation débloquée', 'green');
+    this.closeVerifyModal();
+    this.renderGrid();
+    this.renderHistory();
   },
 
   loadTitle() {
